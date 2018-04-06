@@ -17,8 +17,9 @@
 ##'   app. CAUTION: since this procedure takes a while its run in
 ##'   parallel on all cores of your machine! 
 ##' @param save.downloads If TRUE the downloaded .zip files are stored
-##'   in download.path/downloads_dwd. Else they will be deleted after
+##'   in download.folder/downloads_dwd. Else they will be deleted after
 ##'   the extracting. Default = TRUE.
+##' @param url If the user wants to avoid the guided selection.
 ##' @param csv.export If TRUE creates an additional folder containing
 ##'   .csv files with the individual station data. Using this the data
 ##'   can be used outside of R too. Default = FALSE.
@@ -38,7 +39,7 @@
 ##'   no precipitation, 1 = only rain (before 1979), 2 = unknown, 4 =
 ##'   only rain (after 1979), 7 = only snow, 8 = snow or rain),
 ##'   sunshine.duration, snow.height. Default = default. 
-##' @param download.path Specifies the data will be stored and
+##' @param download.folder Specifies the data will be stored and
 ##'   downloaded too. It is advised to store it in the path stored in
 ##'   the options( "climex.path" ),  which is also used for importing
 ##'   the saved data. You can overwrite its default value of
@@ -54,6 +55,7 @@
 ##' @author Philipp Mueller 
 download.data.dwd <- function( save.downloads = TRUE,
                               csv.export = FALSE,
+                              url = NULL,
                               data.type = c( "default", "temp.max",
                                             "temp.min", "prec",
                                             "temp.mean",
@@ -67,31 +69,37 @@ download.data.dwd <- function( save.downloads = TRUE,
                                             "prec.type", "quality",
                                             "sunshine.duration",
                                             "snow.height" ),
-                              download.path = NULL ){
+                              download.folder = NULL ){
   ## The folder to put all the temporary files of the climex
   ## package in is set in the options(). To modify it,
   ## overwrite the options( climex.path ) in the .Rprofile
   ## file in your home directory
-  if ( is.null( download.path ) ){
-    download.path <- getOption( "climex.path" )
+  if ( is.null( download.folder ) ){
+    download.folder <- getOption( "climex.path" )
   }
   old.dir <- getwd()
   ## If the folder does not exists yet, create it.
-  if ( !dir.exists( download.path ) ){
-    dir.create( download.path, recursive = TRUE )
+  if ( !dir.exists( download.folder ) ){
+    dir.create( download.folder, recursive = TRUE )
   }
-  setwd( download.path ) 
+  setwd( download.folder )
+
+  ## Retrieve the download URLs, extract the URLs to the individual
+  ## files, and download them.
   ## paths on the DWD servers
-  url.recent <- "ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/daily/kl/recent/"
-  url.historical <- "ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/daily/kl/historical/"
-  ## individual files to be downloaded
-  files.recent <- strsplit( RCurl::getURL( url.recent,
-                                          followlocation = TRUE,
-                                          dirlistonly = TRUE ), "\n" )
-  files.historical <- strsplit( RCurl::getURL( url.historical,
-                                              followlocation = TRUE,
-                                              dirlistonly = TRUE ),
-                               "\n" )
+  ## url.recent <- "ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/daily/kl/recent/"
+  ## url.historical <-
+  ## "ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/daily/kl/historical/"
+  if ( is.null( url ) ){
+    url <- get.dwd.ftp.url()
+  }
+  ## Download the files. The subfolders variable will contain the
+  ## subfolders of download.folder, which contain the downloaded
+  ## data.
+  subfolders <- download.content( url,
+                                 download.folder = download.folder )
+ 
+  
   ## setting the column numbers for extraction based on the data.type
   ## input
   if ( missing( data.type ) )
@@ -130,45 +138,7 @@ download.data.dwd <- function( save.downloads = TRUE,
     data.columns <- c( data.columns, 9 )
   if ( "snow.height" %in% data.type )
     data.columns <- c( data.columns, 10 )
-  ## it will be downloaded in separate folders
-  if ( length( grep( "downloads_dwd", getwd() ) ) == 0 ){
-    if ( !dir.exists( "./downloads_dwd" ) )
-      dir.create( "./downloads_dwd" )
-    setwd( "./downloads_dwd" )
-  }
-  if ( !dir.exists( "./recent" ) )
-    dir.create( "./recent" )
-  if ( !dir.exists( "./historical" ) )
-    dir.create( "./historical" )
-  if ( csv.export && !dir.exists( "./data_dwd" ) )
-    dir.create( "./data_dwd" )
 
-  download.content <- function( url.base, url.files ){
-    for ( ff in url.files[[ 1 ]] ){
-      ## Checks if stationsnumber in ff is already present in one name
-      ## of the downloaded files
-      split.string <- unlist( strsplit( ff, "_" ) )
-      ## Depending on the recent or historical data the id of the
-      ## station is the third or second entry. Therefore the first
-      ## numerical entry will be used
-      split.id.character <-
-        paste0( "_", split.string[ grep( "[[:digit:]]",
-                                        split.string )[ 1 ] ], "_" )
-      if ( length( grep( ff, list.files() ) ) != 0 ){
-        ## file is already present
-        next
-      }
-      if ( length( grep( split.id.character, list.files() ) ) != 0 ){
-        ## the file is not present yet but on for the same id.
-        ## So this must be an outdated version. Delete it.
-        file.remove( grep( split.id.character, list.files(),
-                          value = TRUE ) )
-      }
-      utils::download.file( url = paste0( url.base, ff ),
-                           destfile = ff, method = "wget" )
-    }
-  }
-  setwd( "./recent" )
   ## Always download the latest description file. Else the algorithm
   ## would fail importing recently added stations.
   file.description.recent <- grep( "Beschreibung",
@@ -518,7 +488,7 @@ download.data.dwd <- function( save.downloads = TRUE,
 ##'   You can use the \pkg{dwd2r} package to download and use the
 ##'   daily station data provided by the German weather service.
 ##'
-##' @param download.path Specifies the folder in which the function
+##' @param download.folder Specifies the folder in which the function
 ##'   will look for .RData files recursively. Per default the
 ##'   \emph{R/climex/} directory in your home folder will be used. You
 ##'   can overwrite 
@@ -533,28 +503,28 @@ download.data.dwd <- function( save.downloads = TRUE,
 ##' @return Returns invisible but attaches the chosen .RData file to
 ##'   the specified R environment.
 ##' @author Philipp Mueller
-source.data <- function( download.path = NULL, envir = NULL ){
+source.data <- function( download.folder = NULL, envir = NULL ){
   ## The folder to put all the temporary files of the climex
   ## package in is set in the options(). To modify it,
   ## overwrite the options( climex.path ) in the .Rprofile
   ## file in your home directory
-  if ( is.null( download.path ) ){
-    download.path <- getOption( "climex.path" )
+  if ( is.null( download.folder ) ){
+    download.folder <- getOption( "climex.path" )
   }
 
   ## Extract all .RData objects contained in the Climex path.
-  data.path <- list.files( download.path, pattern = ".RData",
+  data.path <- list.files( download.folder, pattern = ".RData",
                           recursive = TRUE )
   ## Obtain the size of the file in MB
   data.size <- rep( NA, length( data.path ) )
   for ( dd in 1 : length( data.path ) ){
     data.size[ dd ] <- file.size(
-        paste0( download.path, data.path[ dd ] ) )/ 1024^2
+        paste0( download.folder, data.path[ dd ] ) )/ 1024^2
   }
 
   ## Print the user a compilation of all found objects.
   cat( '\nImporting data into your R session.\n\n' )
-  cat( paste0( '\tData files found the folder ', download.path,
+  cat( paste0( '\tData files found the folder ', download.folder,
               ':\n\n' ) )
   cat( '   size:\tpath:\n' )
   for ( dd in 1 : length( data.path ) ){
@@ -575,13 +545,14 @@ source.data <- function( download.path = NULL, envir = NULL ){
                data.path[ as.numeric( data.selection ) ], "..." ) )
 
   if ( is.null( envir ) ) {
-    load( file = paste0( download.path,
+    load( file = paste0( download.folder,
                         data.path[ as.numeric( data.selection ) ] ),
          envir = parent.frame() )
   } else {
-    load( file = paste0( download.path,
+    load( file = paste0( download.folder,
                         data.path[ as.numeric( data.selection ) ] ),
          ENVIR = envir )
   } 
   invisible( )
 }
+## End of import.R
