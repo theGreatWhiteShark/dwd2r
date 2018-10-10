@@ -225,7 +225,7 @@ get.dwd.ftp.url <- function(){
         ## daily
         ##
         cat( '\n\n\tMeasurement variable:\n' )
-        cat( '\t\t1) Classical aggregated data (multiple measurement variables\n' )
+        cat( '\t\t1) Classical aggregated data (multiple measurement variables)\n' )
         cat( '\t\t2) Additional precipitation data\n' )
         cat( '\t\t3) Soil temperature\n' )
         cat( '\t\t4) Solar\n' )
@@ -261,7 +261,7 @@ get.dwd.ftp.url <- function(){
         ## monthly
         ##
         cat( '\n\n\tMeasurement variable:\n' )
-        cat( '\t\t1) Classical aggregated data (multiple measurement variables\n' )
+        cat( '\t\t1) Classical aggregated data (multiple measurement variables)\n' )
         cat( '\t\t2) Additional precipitation data\n' )
         selection.fourth.level <- readline( "Selection: " )
 

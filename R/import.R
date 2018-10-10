@@ -96,6 +96,7 @@ download.data.dwd <- function( save.downloads = TRUE,
   ## Download the files. The subfolders variable will contain the
   ## subfolders of download.folder, which contain the downloaded
   ## data.
+  cat( paste( '\tDownload data from', url ) )
   subfolders <- download.content( url,
                                  download.folder = download.folder )
  
@@ -551,7 +552,7 @@ source.data <- function( download.folder = NULL, envir = NULL ){
   } else {
     load( file = paste0( download.folder,
                         data.path[ as.numeric( data.selection ) ] ),
-         ENVIR = envir )
+         envir = envir )
   } 
   invisible( )
 }
