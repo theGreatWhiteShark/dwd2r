@@ -1,14 +1,14 @@
 Package: dwd2r
 Type: Package
 Title: Automated download and formatting of the data provided by the German weather service (DWD).
-Version: 0.0.1
+Version: 0.0.1.6000
 Date: 2018-04-03
 LazyData: true
 Authors@R: person("Philipp Mueller", role = c("aut","cre"),
     email = "thetruephil@googlemail.com")
 Maintainer: Philipp Mueller <thetruephil@googlemail.com>
 Description: 
-URL: https://github.com/theGreatWhiteShark/dwd2r
+URL: https://gitlab.com/theGreatWhiteShark/dwd2r
 Depends:
     R(>= 3.3.0),
     xts
