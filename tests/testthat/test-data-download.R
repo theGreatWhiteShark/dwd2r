@@ -54,7 +54,10 @@ test_that( "'download.content' has the right output", {
               
 ## Create a new file in the folder and simulate an outdated file not
 ## present at the FTP server anymore
-file.create( paste0( tmp.dir.name, "/observations_germany/phenology/annual_reporters/vine/recent/", 'test' ) )
+aux <- file.create( paste0(
+    tmp.dir.name,
+    "/observations_germany/phenology/annual_reporters/vine/recent/",
+    'test' ) )
 test_that( "'download.content' removes outdated files", {
   expect_equal( length( list.files( tmp.dir.name,
                                    recursive = TRUE ) ), 7 )

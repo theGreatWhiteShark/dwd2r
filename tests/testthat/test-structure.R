@@ -47,12 +47,14 @@ if ( RCurl::url.exists( "fsfe.org" ) &&
 
   ## download a sample
   dir.create( "./download-test-funny-name-nobody-would-choose" )
+  current.working.directory <- getwd()
   setwd( "./download-test-funny-name-nobody-would-choose" )
+  current.warning.level <- getOption( "warn" )
   options( warn = 2 )
   utils::download.file(
              paste0( url.recent,
                     files.recent[[ 1 ]][ files.recent.length ] ),
-             destfile = "test.zip" )
+             destfile = "test.zip", quiet = TRUE )
   utils::unzip( "./test.zip" )
   test_that( "DWD's zip files content has not changed", {
     expect_equal( length( grep( "produkt", list.files() ) ), 1 )
@@ -109,7 +111,8 @@ if ( RCurl::url.exists( "fsfe.org" ) &&
     expect_warning( as.numeric( description.content[ 7 ] ) )
   })
   ## cleanup
-  setwd( ".." )
+  setwd( current.working.directory )
   unlink( "./download-test-funny-name-nobody-would-choose",
          recursive = TRUE )
+  options( warn = current.warning.level )
 }
