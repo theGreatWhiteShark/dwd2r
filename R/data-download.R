@@ -18,7 +18,17 @@ list.files.in.url <- function( url ){
   if ( class( url ) != "character" ){
     stop( "The input of 'dwd2r:::list.file.in.url' must be a character vector" )
   }
-  if ( !RCurl::url.exists( url ) ){
+  ## For some reason there is a severe bug in the RCurl package right
+  ## now (version 1.95-4.11) causing a core dump when checking for the
+  ## existence of the URLs using lapply. Therefore, we will do it the
+  ## old-fashioned way.
+  check.existence <- logical( length = length( url ) )
+  for ( ll in 1 : length( url ) ){
+    ## Avoid being recognized as a bot by the DWD server.
+    Sys.sleep( .001 )
+    check.existence[ ll ] <- RCurl::url.exists( url[ ll ] )
+  }
+  if ( !all( check.existence ) ){
     stop( "Server is not reachable. You either entered a wrong URL or have no sufficient connection to the internet." )
   }
   uri.list <-
@@ -174,6 +184,9 @@ download.content <- function( url, download.folder = NULL,
     utils::download.file( url = paste0( url.root, ff ),
                          method = "wget", quiet = quiet,
                          destfile = paste0( download.folder, ff ) )
+    ## Wait in order to not be recognized as a bot by the server of
+    ## the DWD
+    Sys.sleep( .00001 )
   }
   
   ## Ensure the subfolders returned by the function end with a '/'
