@@ -4,11 +4,12 @@
 \alias{download.data.dwd}
 \title{Downloads data of the DWD}
 \usage{
-download.data.dwd(save.downloads = TRUE, csv.export = FALSE, url = NULL,
-  data.type = c("default", "temp.max", "temp.min", "prec", "temp.mean",
-  "vapor.pressure", "cloud.amount", "air.pressure", "relative.humidity",
-  "wind.speed", "temp.min.at.ground", "wind.speed.peak", "prec.type", "quality",
-  "sunshine.duration", "snow.height"), download.folder = NULL)
+download.data.dwd(save.downloads = TRUE, csv.export = FALSE,
+  url = NULL, data.type = c("default", "temp.max", "temp.min", "prec",
+  "temp.mean", "vapor.pressure", "cloud.amount", "air.pressure",
+  "relative.humidity", "wind.speed", "temp.min.at.ground",
+  "wind.speed.peak", "prec.type", "quality", "sunshine.duration",
+  "snow.height"), download.folder = NULL)
 }
 \arguments{
 \item{save.downloads}{If TRUE the downloaded .zip files are stored

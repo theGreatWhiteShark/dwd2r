@@ -39,3 +39,4 @@ Other dwd-urls: \code{\link{get.dwd.ftp.url}}
 \author{
 Philipp Mueller
 }
+\concept{dwd-urls}
