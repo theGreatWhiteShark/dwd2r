@@ -179,14 +179,41 @@ download.content <- function( url, download.folder = NULL,
     unlink( paste0( download.folder, ss, '/', files.outdated ) )
   }
 
+  ## Maximum number of tries per file.
+  number.of.download.tries <- 10
   ## Download the new files.
   for ( ff in files.new ){
-    utils::download.file( url = paste0( url.root, ff ),
-                         method = "wget", quiet = quiet,
-                         destfile = paste0( download.folder, ff ) )
+    wget.try <- try(
+        utils::download.file(
+                   url = paste0( url.root, ff ),
+                   method = "wget", quiet = quiet,
+                   destfile = paste0( download.folder, ff ) ) )
+    ## In case the download did fail because the connection was
+    ## refused or wget failed to authenticate, just try again. Usually
+    ## these problems are temporary.
+    if ( class( wget.try ) == "try-error" ){
+      current.try <- 1
+      while ( current.try < number.of.download.tries &&
+             class( wget.try ) == "try-error" ){
+               wget.try <- try(
+                   utils::download.file(
+                              url = paste0( url.root, ff ),
+                              method = "wget", quiet = quiet,
+                              destfile = paste0( download.folder,
+                                                ff ),
+                              extra = c( "--tries 5" ) ) )
+               current.try <- current.try + 1
+             }
+      ## Display a warning in case one file couldn't be downloaded at
+      ## all.
+      if ( class( wget.try ) == "try-error" ){
+        warning( paste( "The file", paste0( url.root, ff ),
+                       "could not be downloaded!" ) )
+      }
+    }
     ## Wait in order to not be recognized as a bot by the server of
     ## the DWD
-    Sys.sleep( .00001 )
+    Sys.sleep( .001 )
   }
   
   ## Ensure the subfolders returned by the function end with a '/'
