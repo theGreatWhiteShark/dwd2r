@@ -4,28 +4,29 @@
 ##'   as well as precipitation data.
 ##'
 ##' @details The download will be done using 'wget'. Per default the
-##'   climex.path variable from the getOption( "climex.path" ) will be
-##'   used to set the download path. Since this function will check
-##'   the files already present it's strongly recommended to use the
-##'   save.downloads options. Whenever this function is invoked again
-##'   only updated files will be downloaded which saves a lot of
-##'   traffic and time. The csv.export option can be used to export
-##'   the time series into a data type file making it available
-##'   outside of R too. In addition, the geographic positions of the
-##'   individual stations will be extracted and saved as well. They
-##'   are needed for the leaflet module of the climex shiny
-##'   app. CAUTION: since this procedure takes a while its run in
-##'   parallel on all cores of your machine! 
+##'   dwd2r.download.path variable from the \code{getOption(
+##'   "dwd2r.download.path" )} will be used to set the download
+##'   path. Since this function will check the files already present
+##'   it's strongly recommended to use the save.downloads
+##'   options. Whenever this function is invoked again only updated
+##'   files will be downloaded which saves a lot of traffic and
+##'   time. The csv.export option can be used to export the time
+##'   series into a data type file making it available outside of R
+##'   too. In addition, the geographic positions of the individual
+##'   stations will be extracted and saved as well. They are needed
+##'   for the leaflet module of the climex shiny app. CAUTION: since
+##'   this procedure takes a while its run in parallel on all cores of
+##'   your machine!
 ##' @param save.downloads If TRUE the downloaded .zip files are stored
-##'   in download.folder/downloads_dwd. Else they will be deleted after
-##'   the extracting. Default = TRUE.
+##'   in download.folder/downloads_dwd. Else they will be deleted
+##'   after the extracting. Default = TRUE.
 ##' @param url If the user wants to avoid the guided selection.
 ##' @param csv.export If TRUE creates an additional folder containing
 ##'   .csv files with the individual station data. Using this the data
 ##'   can be used outside of R too. Default = FALSE.
 ##' @param data.type Specifies which kind of information from the
 ##'   downloaded files should be extracted. This input can be a
-##'   character vector  The options are: temp.max, temp.min, prec,
+##'   character vector The options are: temp.max, temp.min, prec,
 ##'   default (for both the daily maximum and minimum temperature and
 ##'   the precipitation), temp.mean, vapor.pressure, cloud.amount,
 ##'   air.pressure, quality (-999 = faulty or suspicious, 1 =
@@ -38,13 +39,14 @@
 ##'   wind.speed, temp.min.at.ground, wind.speed.peak, prec.type (0 =
 ##'   no precipitation, 1 = only rain (before 1979), 2 = unknown, 4 =
 ##'   only rain (after 1979), 7 = only snow, 8 = snow or rain),
-##'   sunshine.duration, snow.height. Default = default. 
+##'   sunshine.duration, snow.height. Default = default.
 ##' @param download.folder Specifies the data will be stored and
 ##'   downloaded too. It is advised to store it in the path stored in
-##'   the options( "climex.path" ),  which is also used for importing
-##'   the saved data. You can overwrite its default value of
-##'   "~/R/climex/" by adding options( climex.path = "PATH" ) to your
-##'   .Rprofile path in your home. 
+##'   the \code{options( "dwd2r.download.path" )}, which is also used
+##'   for importing the saved data. You can overwrite its default
+##'   value of "~/R/dwd_data/" by adding \code{options(
+##'   dwd2r.download.path = "PATH" )} to your .Rprofile path in your
+##'   home.
 ##' 
 ##' @export
 ##' 
@@ -70,12 +72,12 @@ download.data.dwd <- function( save.downloads = TRUE,
                                             "sunshine.duration",
                                             "snow.height" ),
                               download.folder = NULL ){
-  ## The folder to put all the temporary files of the climex
-  ## package in is set in the options(). To modify it,
-  ## overwrite the options( climex.path ) in the .Rprofile
-  ## file in your home directory
+  ## The folder to put all the temporary files of the dwd2r package in
+  ## is set in the options(). To modify it, overwrite the options(
+  ## dwd2r.download.path ) in the .Rprofile file in your home
+  ## directory
   if ( is.null( download.folder ) ){
-    download.folder <- getOption( "climex.path" )
+    download.folder <- getOption( "dwd2r.download.path" )
   }
   old.dir <- getwd()
   ## If the folder does not exists yet, create it.
@@ -479,11 +481,11 @@ download.data.dwd <- function( save.downloads = TRUE,
 }
 
 ##' @title Load a data file into R
-##' @description Searches the \emph{~/R/climex/} directory or a
+##' @description Searches the \emph{~/R/dwd_data/} directory or a
 ##'   specified folder for .RData files recursively and displays the
 ##'   user its findings for her to choose one of them.
-##' @details In order to use the data with the \pkg{climex}, the data
-##'   should be of class \pkg{xts} or of lists of class \pkg{xts}
+##' @details In order to use the data with the \pkg{climex} package,
+##'   it should be of class \pkg{xts} or of lists of class \pkg{xts}
 ##'   objects.
 ##'
 ##'   You can use the \pkg{dwd2r} package to download and use the
@@ -491,12 +493,12 @@ download.data.dwd <- function( save.downloads = TRUE,
 ##'
 ##' @param download.folder Specifies the folder in which the function
 ##'   will look for .RData files recursively. Per default the
-##'   \emph{R/climex/} directory in your home folder will be used. You
-##'   can overwrite 
-##'   this behavior by setting \code{options( climex.path = "PATH" )}
-##'   in your \emph{.Rprofile} path in your home.
-##' @param envir Environment the data will be attached to. If
-##'   not specified, the data will be loaded to the environment the
+##'   \emph{R/dwd_data/} directory in your home folder will be
+##'   used. You can overwrite this behavior by setting \code{options(
+##'   dwd2r.download.path = "PATH" )} in your \emph{.Rprofile} path in
+##'   your home.
+##' @param envir Environment the data will be attached to. If not
+##'   specified, the data will be loaded to the environment the
 ##'   function is called from. Default = NULL.
 ##' @family import
 ##'  
@@ -505,15 +507,15 @@ download.data.dwd <- function( save.downloads = TRUE,
 ##'   the specified R environment.
 ##' @author Philipp Mueller
 source.data <- function( download.folder = NULL, envir = NULL ){
-  ## The folder to put all the temporary files of the climex
+  ## The folder to put all the temporary files of the dwd2r
   ## package in is set in the options(). To modify it,
-  ## overwrite the options( climex.path ) in the .Rprofile
+  ## overwrite the options( dwd2r.download.path ) in the .Rprofile
   ## file in your home directory
   if ( is.null( download.folder ) ){
-    download.folder <- getOption( "climex.path" )
+    download.folder <- getOption( "dwd2r.download.path" )
   }
 
-  ## Extract all .RData objects contained in the Climex path.
+  ## Extract all .RData objects contained in the download path.
   data.path <- list.files( download.folder, pattern = ".RData",
                           recursive = TRUE )
   ## Obtain the size of the file in MB

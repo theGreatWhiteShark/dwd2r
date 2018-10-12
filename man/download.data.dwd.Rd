@@ -13,8 +13,8 @@ download.data.dwd(save.downloads = TRUE, csv.export = FALSE,
 }
 \arguments{
 \item{save.downloads}{If TRUE the downloaded .zip files are stored
-in download.folder/downloads_dwd. Else they will be deleted after
-the extracting. Default = TRUE.}
+in download.folder/downloads_dwd. Else they will be deleted
+after the extracting. Default = TRUE.}
 
 \item{csv.export}{If TRUE creates an additional folder containing
 .csv files with the individual station data. Using this the data
@@ -24,7 +24,7 @@ can be used outside of R too. Default = FALSE.}
 
 \item{data.type}{Specifies which kind of information from the
 downloaded files should be extracted. This input can be a
-character vector  The options are: temp.max, temp.min, prec,
+character vector The options are: temp.max, temp.min, prec,
 default (for both the daily maximum and minimum temperature and
 the precipitation), temp.mean, vapor.pressure, cloud.amount,
 air.pressure, quality (-999 = faulty or suspicious, 1 =
@@ -41,10 +41,11 @@ sunshine.duration, snow.height. Default = default.}
 
 \item{download.folder}{Specifies the data will be stored and
 downloaded too. It is advised to store it in the path stored in
-the options( "climex.path" ),  which is also used for importing
-the saved data. You can overwrite its default value of
-"~/R/climex/" by adding options( climex.path = "PATH" ) to your
-.Rprofile path in your home.}
+the \code{options( "dwd2r.download.path" )}, which is also used
+for importing the saved data. You can overwrite its default
+value of "~/R/dwd_data/" by adding \code{options(
+dwd2r.download.path = "PATH" )} to your .Rprofile path in your
+home.}
 }
 \value{
 invisible setwd()
@@ -56,18 +57,19 @@ Downloads daily weather data from observation
 }
 \details{
 The download will be done using 'wget'. Per default the
-  climex.path variable from the getOption( "climex.path" ) will be
-  used to set the download path. Since this function will check
-  the files already present it's strongly recommended to use the
-  save.downloads options. Whenever this function is invoked again
-  only updated files will be downloaded which saves a lot of
-  traffic and time. The csv.export option can be used to export
-  the time series into a data type file making it available
-  outside of R too. In addition, the geographic positions of the
-  individual stations will be extracted and saved as well. They
-  are needed for the leaflet module of the climex shiny
-  app. CAUTION: since this procedure takes a while its run in
-  parallel on all cores of your machine!
+  dwd2r.download.path variable from the \code{getOption(
+  "dwd2r.download.path" )} will be used to set the download
+  path. Since this function will check the files already present
+  it's strongly recommended to use the save.downloads
+  options. Whenever this function is invoked again only updated
+  files will be downloaded which saves a lot of traffic and
+  time. The csv.export option can be used to export the time
+  series into a data type file making it available outside of R
+  too. In addition, the geographic positions of the individual
+  stations will be extracted and saved as well. They are needed
+  for the leaflet module of the climex shiny app. CAUTION: since
+  this procedure takes a while its run in parallel on all cores of
+  your machine!
 }
 \author{
 Philipp Mueller
