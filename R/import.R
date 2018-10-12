@@ -101,7 +101,30 @@ download.data.dwd <- function( save.downloads = TRUE,
   cat( paste( '\tDownload data from', url ) )
   subfolders <- download.content( url,
                                  download.folder = download.folder )
- 
+
+  ## Classical conversion
+  ## Pointing to the location of the downloaded files
+  if ( length( grep( "recent", subfolders ) ) != 0 ){
+    files.recent <- list.files( paste0(
+        download.folder,
+        subfolders[ grep( "recent", subfolders ) ] ) )
+  } else {
+    files.recent <- NULL
+    warning( "No recent measurements for the chosen data set" )
+  }
+  if ( length( grep( "historical", subfolders ) ) != 0 ){
+    files.historical <- list.files( paste0(
+        download.folder,
+        subfolders[ grep( "historical", subfolders ) ] ) )
+  } else {
+    files.historical <- NULL
+    warning( "No historical measurements for the chosen data set" )
+  }
+  ## If no files are present, abort.
+  if ( is.null( files.recent ) && is.null( files.historical ) ){
+    stop(
+        "No files containing measurements found for the chosen data set" )
+  }
   
   ## setting the column numbers for extraction based on the data.type
   ## input
