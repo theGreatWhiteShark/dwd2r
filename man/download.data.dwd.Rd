@@ -9,7 +9,7 @@ download.data.dwd(save.downloads = TRUE, csv.export = FALSE,
   "temp.mean", "vapor.pressure", "cloud.amount", "air.pressure",
   "relative.humidity", "wind.speed", "temp.min.at.ground",
   "wind.speed.peak", "prec.type", "quality", "sunshine.duration",
-  "snow.height"), download.folder = NULL)
+  "snow.height"), download.folder = NULL, batch.choices = NULL)
 }
 \arguments{
 \item{save.downloads}{If TRUE the downloaded .zip files are stored
@@ -46,6 +46,10 @@ for importing the saved data. You can overwrite its default
 value of "~/R/dwd_data/" by adding \code{options(
 dwd2r.download.path = "PATH" )} to your .Rprofile path in your
 home.}
+
+\item{batch.choices}{Numerical vector containing the numbers,
+which corresponds to the choices in the interactive mode. If
+NULL, the choices will be done interactively. Default = NULL.}
 }
 \value{
 invisible setwd()
@@ -70,6 +74,16 @@ The download will be done using 'wget'. Per default the
   for the leaflet module of the climex shiny app. CAUTION: since
   this procedure takes a while its run in parallel on all cores of
   your machine!
+}
+\examples{
+## Downloading the aggregated collection of the daily measured
+## climatic data of the DWD into a local folder, create .csv files
+## from all the time series, and store the files (to be able to do
+## a diff at a latter point in time).
+download.data.dwd( save.downloads = TRUE, csv.export = TRUE,
+                   download.folder = "./local/folder",
+                   batch.choices  = c( 1, 1, 5, 1 ) )
+
 }
 \author{
 Philipp Mueller

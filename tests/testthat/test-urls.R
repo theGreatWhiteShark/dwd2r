@@ -48,5 +48,15 @@ test_that( "the cat.dwd.ftp.url function has the same output format",{
                  "regional.averages.germany" ) )
   expect_equal( unique( Reduce( c, lapply( cat.dwd.ftp.url(),
                                           class ) ) ),
-               "character" ) } ) 
+               "character" ) } )
+test_that( "the batch mode of get.dwd.ftp.url does work", {
+  expect_equal( get.dwd.ftp.url( batch.choices =
+                                   c( 1, 1, 5, 1 ) )$data,
+               c(
+  "ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/daily/kl/historical/", 
+  "ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/daily/kl/recent/" ) )
+  expect_true( is.null( get.dwd.ftp.url( batch.choices =
+                                           c( 1, 1, 5, 1 ) )$meta ) )
+  expect_error( get.dwd.ftp.url( batch.choices = c( 1, 8, 5, 1 ) ) )
+})
 ### End of test-urls.R

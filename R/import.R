@@ -47,8 +47,20 @@
 ##'   value of "~/R/dwd_data/" by adding \code{options(
 ##'   dwd2r.download.path = "PATH" )} to your .Rprofile path in your
 ##'   home.
+##' @param batch.choices Numerical vector containing the numbers,
+##'   which corresponds to the choices in the interactive mode. If
+##'   NULL, the choices will be done interactively. Default = NULL.
 ##' 
 ##' @export
+##'
+##' @examples
+##' ## Downloading the aggregated collection of the daily measured
+##' ## climatic data of the DWD into a local folder, create .csv files
+##' ## from all the time series, and store the files (to be able to do
+##' ## a diff at a latter point in time).
+##' download.data.dwd( save.downloads = TRUE, csv.export = TRUE,
+##'                    download.folder = "./local/folder",
+##'                    batch.choices  = c( 1, 1, 5, 1 ) )
 ##' 
 ##' @importFrom xts xts
 ##' 
@@ -71,7 +83,8 @@ download.data.dwd <- function( save.downloads = TRUE,
                                             "prec.type", "quality",
                                             "sunshine.duration",
                                             "snow.height" ),
-                              download.folder = NULL ){
+                              download.folder = NULL,
+                              batch.choices = NULL ){
   ## The folder to put all the temporary files of the dwd2r package in
   ## is set in the options(). To modify it, overwrite the options(
   ## dwd2r.download.path ) in the .Rprofile file in your home

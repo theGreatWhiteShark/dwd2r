@@ -4,7 +4,12 @@
 \alias{get.dwd.ftp.url}
 \title{Obtain URLs to the FTP server}
 \usage{
-get.dwd.ftp.url()
+get.dwd.ftp.url(batch.choices = NULL)
+}
+\arguments{
+\item{batch.choices}{Numerical vector containing the numbers,
+which corresponds to the choices in the interactive mode. If
+NULL, the choices will be done interactively. Default = NULL.}
 }
 \value{
 List containing to two elements
@@ -27,7 +32,9 @@ Since there is A LOT of different data provided by
   them all using input arguments to this function. Instead, the
   user will be guided interactively through the different data
   sources and specifies the data she want using the inputs at the
-  prompt.
+  prompt. If you prefer to run the function non-interactive, you
+  can use the \emph{batch.choices} argument and supply a vector of
+  numbers corresponding to your choices.
 
   As another option, you can use the \code{\link{cat.dwd.ftp.url}}
   function, which returns a vector containing all download
@@ -41,6 +48,12 @@ Since there is A LOT of different data provided by
 
   Before using the data of the DWD, be sure you read its
   \url{ftp://ftp-cdc.dwd.de/pub/CDC/Terms_of_use.pdf}!
+}
+\examples{
+## Get the URLs pointing to the aggregated collection of the daily
+## measured climatic data of the DWD.
+get.dwd.ftp.url( batch.choices  = c( 1, 1, 5, 1 ) )
+
 }
 \seealso{
 Other dwd-urls: \code{\link{cat.dwd.ftp.url}}
