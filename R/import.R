@@ -106,8 +106,14 @@ download.data.dwd <- function( save.downloads = TRUE,
   ## url.historical <-
   ## "ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/daily/kl/historical/"
   if ( is.null( url ) ){
-    url <- get.dwd.ftp.url()
+    url.full.content <- get.dwd.ftp.url( batch.choices = batch.choices )
   }
+  if ( !is.null( url.full.content$meta ) ){
+    warning(
+        "Data sources containing meta information are not supported yet!" )
+  }
+  ## URLs pointing to the actual data.
+  url <- url.full.content$data
   ## Download the files. The subfolders variable will contain the
   ## subfolders of download.folder, which contain the downloaded
   ## data.
@@ -115,29 +121,37 @@ download.data.dwd <- function( save.downloads = TRUE,
   subfolders <- download.content( url,
                                  download.folder = download.folder )
 
-  ## Classical conversion
-  ## Pointing to the location of the downloaded files
+  ## Get a list of all files, which were part of the download.
+  ## In the classical, aggregated way of providing the data the DWD
+  ## splits the time series and provides all data more recent than
+  ## approximately one year in the *recent* folder and everything else
+  ## in the *historical* folder. These ones are treated separately.
   if ( length( grep( "recent", subfolders ) ) != 0 ){
+    indices.recent <- grep( "recent", subfolders )
     files.recent <- list.files( paste0(
-        download.folder,
-        subfolders[ grep( "recent", subfolders ) ] ) )
+        download.folder, subfolders[ indices.recent ] ) )
   } else {
-    files.recent <- NULL
-    warning( "No recent measurements for the chosen data set" )
+    files.recent <- indices.recent <- NULL
   }
   if ( length( grep( "historical", subfolders ) ) != 0 ){
+    indices.historical <- grep( "historical", subfolders )
     files.historical <- list.files( paste0(
-        download.folder,
-        subfolders[ grep( "historical", subfolders ) ] ) )
+        download.folder, subfolders[ indices.historical ] ) )
   } else {
-    files.historical <- NULL
-    warning( "No historical measurements for the chosen data set" )
+    files.historical <- indices.historical <- NULL
   }
-  ## If no files are present, abort.
-  if ( is.null( files.recent ) && is.null( files.historical ) ){
-    stop(
-        "No files containing measurements found for the chosen data set" )
+  ## Get all other files
+  if ( length( subfolders ) > ( length( indices.recent ) +
+                                length( indices.historical ) ) ){
+    ## The recent and historical ones do not cover all choices
+    message( "not just recent and historical" )
+    files.diverse <- list.files( paste0(
+        download.folder, subfolders[ -c( indices.recent,
+                                        indices.historical ) ] ) )
+  } else {
+    files.diverse <- NULL
   }
+
   
   ## setting the column numbers for extraction based on the data.type
   ## input
@@ -180,12 +194,45 @@ download.data.dwd <- function( save.downloads = TRUE,
 
   ## Always download the latest description file. Else the algorithm
   ## would fail importing recently added stations.
-  file.description.recent <- grep( "Beschreibung",
-                                  files.recent[[ 1 ]], value = TRUE )
-  utils::download.file( url = paste0( url.recent,
-                                     file.description.recent ),
-                       destfile = file.description.recent,
-                       method = "wget" )
+  if ( !is.null( files.recent ) ){
+    file.description.recent <-
+      grep( "Beschreibung", files.recent, value = TRUE )
+    if ( length( file.description.recent ) > 1 ){
+      warning(
+          "More than one recent 'Beschreibung' file found. Algorithm will misbehave!" )
+    }
+    if ( length( indices.recent ) ){
+      warning(
+          "More than one folder containing the recent measurements. The algorithm will not handle this properly!" )
+    }
+    utils::download.file(
+               url = paste0( url[ indices.recent ],
+                            file.description.recent ),
+               destfile = paste0( subfolders[ indices.recent ],
+                                 file.description.recent ),
+               method = "wget" )
+  } else if ( !is.null( files.diverse ) ){
+    file.description.diverse <-
+      grep( "Beschreibung", files.diverse, value = TRUE )
+    if ( length( file.description.diverse ) > 1 ){
+      warning(
+          "More than one diverse 'Beschreibung' file found. Algorithm will misbehave!" )
+    }
+    if ( length( indices.recent ) ){
+      warning(
+          "More than one folder containing the diverse measurements. The algorithm will not handle this properly!" )
+    }
+    utils::download.file(
+               url = paste0( url[ indices.diverse ],
+                            file.description.diverse ),
+               destfile = paste0( subfolder[ indices.diverse ],
+                                 file.description.diverse ),
+                         method = "wget" )
+  } else {
+    warning(
+        "There are no recent or other files. Something probably went wrong" )
+  }
+
   ## This will download quite a number of .zip files
   download.content( url.recent, files.recent )
   setwd( "../historical" )
