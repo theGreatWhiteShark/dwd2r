@@ -50,6 +50,8 @@
 ##' @param batch.choices Numerical vector containing the numbers,
 ##'   which corresponds to the choices in the interactive mode. If
 ##'   NULL, the choices will be done interactively. Default = NULL.
+##' @param quiet Whether or not to display the output generated when
+##'   downloading the content. Default = FALSE.
 ##' 
 ##' @export
 ##'
@@ -84,7 +86,8 @@ download.data.dwd <- function( save.downloads = TRUE,
                                             "sunshine.duration",
                                             "snow.height" ),
                               download.folder = NULL,
-                              batch.choices = NULL ){
+                              batch.choices = NULL,
+                              quiet = FALSE ){
   ## The folder to put all the temporary files of the dwd2r package in
   ## is set in the options(). To modify it, overwrite the options(
   ## dwd2r.download.path ) in the .Rprofile file in your home
@@ -117,9 +120,10 @@ download.data.dwd <- function( save.downloads = TRUE,
   ## Download the files. The subfolders variable will contain the
   ## subfolders of download.folder, which contain the downloaded
   ## data.
-  cat( paste( '\tDownload data from', url ) )
-  subfolders <- download.content( url,
-                                 download.folder = download.folder )
+  cat( 'Download data from\n' )
+  lapply( url, function( uu ) cat( paste0( '- ',uu, '\n' ) ) )
+  subfolders <- download.content(
+      url = url, download.folder = download.folder, quiet = quiet )
 
   ## Get a list of all files, which were part of the download.
   ## In the classical, aggregated way of providing the data the DWD
@@ -210,7 +214,7 @@ download.data.dwd <- function( save.downloads = TRUE,
                             file.description.recent ),
                destfile = paste0( subfolders[ indices.recent ],
                                  file.description.recent ),
-               method = "wget" )
+               method = "wget", quiet = quiet )
   } else if ( !is.null( files.diverse ) ){
     file.description.diverse <-
       grep( "Beschreibung", files.diverse, value = TRUE )
@@ -227,7 +231,7 @@ download.data.dwd <- function( save.downloads = TRUE,
                             file.description.diverse ),
                destfile = paste0( subfolder[ indices.diverse ],
                                  file.description.diverse ),
-                         method = "wget" )
+               method = "wget", quiet = quiet )
   } else {
     warning(
         "There are no recent or other files. Something probably went wrong" )
@@ -289,6 +293,7 @@ download.data.dwd <- function( save.downloads = TRUE,
   file.description <- lapply( file.d.5, function( x )
     gsub( "\U3e36643c", "\uD6", x ) )      
 
+  browser()
   ## extract a vector of all unique station IDs seen in the .zip files
   list.station.ids <- as.list( unique( c(
       Reduce( c, lapply( list.files( "./recent/" )[

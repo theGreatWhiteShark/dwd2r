@@ -9,7 +9,8 @@ download.data.dwd(save.downloads = TRUE, csv.export = FALSE,
   "temp.mean", "vapor.pressure", "cloud.amount", "air.pressure",
   "relative.humidity", "wind.speed", "temp.min.at.ground",
   "wind.speed.peak", "prec.type", "quality", "sunshine.duration",
-  "snow.height"), download.folder = NULL, batch.choices = NULL)
+  "snow.height"), download.folder = NULL, batch.choices = NULL,
+  quiet = FALSE)
 }
 \arguments{
 \item{save.downloads}{If TRUE the downloaded .zip files are stored
@@ -50,6 +51,9 @@ home.}
 \item{batch.choices}{Numerical vector containing the numbers,
 which corresponds to the choices in the interactive mode. If
 NULL, the choices will be done interactively. Default = NULL.}
+
+\item{quiet}{Whether or not to display the output generated when
+downloading the content. Default = FALSE.}
 }
 \value{
 invisible setwd()
