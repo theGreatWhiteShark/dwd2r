@@ -1540,24 +1540,37 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
 ##' @title Checking the validity of URLs
 ##' @description This helper functions tests whether URLs are
 ##'   reachable and throws an error if this is not the case.
-##'
+##' @details The check will be performed \strong{number.of.tries} per
+##'   URL. The FTP server of the DWD is quite prone to identify the
+##'   \code{RCurl::url.exists} function as an DDOS attempt. Therefore,
+##'   one often was to redo the check after some milliseconds (10ms)
+##'   of waiting.
+##' 
 ##' @param url Either a simple string or a character vector of several
 ##'   URLs.
+##' @param number.of.tries Numerical value of how often the function
+##'   attempts to test each URL before reporting it to be
+##'   unavailable. Default = 5.
 ##'
 ##' @importFrom RCurl url.exists
 ##'
 ##' @return invisible( TRUE ) if all URLs exist. Throws an error if
 ##'   not. 
 ##' @author Philipp Mueller
-dwd2r.url.check <- function( url ){
+dwd2r.url.check <- function( url, number.of.tries = 5 ){
   ## Test the URL collected so far.
   for ( uu in 1 : length( url ) ){
-    if ( !RCurl::url.exists( url[ uu ] ) ){
-      stop( paste( "The URL", url[ uu ],
-                  "does not exist on the FTP server of the DWD." ) )
+    for ( nn in 1 : number.of.tries ){
+      ## Avoid being detect as a bot
+      Sys.sleep( .01 )
+      if ( RCurl::url.exists( url[ uu ] ) ){
+        break
+      }
+      if ( nn == number.of.tries ){
+        stop( paste( "The URL", url[ uu ],
+                    "does not exist on the FTP server of the DWD." ) )
+      }
     }
-    ## Avoid being detect as a bot
-    Sys.sleep( .01 )
   }
   invisible( TRUE )
 }
