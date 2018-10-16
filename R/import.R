@@ -108,34 +108,51 @@ conversion.climate <- function( files.list, files.description.list,
     dir.create( download.folder.historical, recursive = TRUE )
   }
 
-  ## browser()
-  extract.content.climate(
-      station.id = list.station.ids[[ 1 ]],
-      files.list = list( recent = files.list$recent,
-                        historical = files.list$historical ),
-      download.folder.recent = download.folder.recent,
-      download.folder.historical = download.folder.recent )
+  ## Extract the content of all files. The content is a list of
+  ## xts-class time series and the content of each file (corresponding
+  ## to a station) will be an element of the stations.content list.
+  if ( !quiet ){
+    cat( 'Starting the extraction of the content...\n' )
+  }
+  stations.content <-
+    lapply( seq( 1 , 10 ), function( ll ){
+      if ( !quiet && ll %% 10 ){
+        cat( paste( "Extracting file", ll, "of",
+                   length( list.station.ids ), "\n" ) )
+      }
+      stations.content[[ ll ]] <- 
+        extract.content.climate(
+            station.id = list.station.ids[[ ll ]],
+            files.list = list( recent = files.list$recent,
+                              historical = files.list$historical ),
+            download.folder.recent = download.folder.recent,
+            download.folder.historical = download.folder.historical )
+    } )
 
   ## Clean up and delete the auxiliary folders used in extraction.
   unlink( download.folder.recent, recursive = TRUE )
   unlink( download.folder.historical, recursive = TRUE )
 
-  ## This lists will contain all the final station data
-  ## I will only extract the maximum, minimum temperature and the
-  ## precipitation but it is easily extendable to all other columns
-  stations.temp.max.xts <- stations.temp.min.xts <-
-    stations.prec.xts <- list()
-  ## For each data type a separate list containing the corresponding
-  ## data of all stations will be generated
-  ## This takes some time. But unfortunately it can't be parallelized
-  ## easily since all thread read and write to the same folders. So no
-  ## "progress bar" either
-  for ( dd in 1 : length( data.type ) ){
-    print( paste( "parsing", data.type[ dd ], "data..." ) )
-    assign( paste0( "stations.", data.type[ dd ] ),
-           lapply( list.station.ids, function( x )
-             extract.content( x, data.columns[ dd ] ) ) )
+  ## Now, we restructure the data to have a list representing a
+  ## climatological quantity and its elements to correspond to the
+  ## individual stations. Beforehand, each list represented a station
+  ## and its elements corresponded to the climatological
+  ## quantities. Restructuring it this way eases a massive parallel
+  ## application in the analysis of e.g. the temperature. The
+  ## following object will be a list of all quantities. It will get
+  ## split into different entities at a latter point.
+  quantities.content <-
+    lapply( 1 : length( stations.content[[ 1 ]] ), function( qq )
+      lapply( stations.content, function( ss ) ss[[ qq ]] ) )
+  
+  ## Create a distinct objects for each climatological quantity.
+  for ( qq in 1 : length( quantities.content ) ){
+    assign( paste0( "dwd.", names( stations.content[[ 1 ]] )[ qq ] ),
+           quantities.content[[ qq ]] )
   }
+
+  browser()
+  
   ## assigning the stations names
   station.extracts <- parallel::mclapply( list.station.ids, function( x )
     extract.station.names( x, file.description ),
@@ -236,14 +253,20 @@ extract.content.climate <- function( station.id, files.list,
     stop( "Please provide only one station ID!" )
   }
   ## Delete the content of the auxiliary folders
-  unlink( list.files( download.folder.recent ), recursive = TRUE )
-  unlink( list.files( download.folder.historical ), recursive = TRUE )
+  unlink( paste0( download.folder.recent,
+                 list.files( download.folder.recent ) ),
+         recursive = TRUE )
+  unlink( paste0( download.folder.historical,
+                 list.files( download.folder.historical ) ),
+         recursive = TRUE )
   ## Obtain the index corresponding to the station ID.
-  index.recent <- grep( station.id, files.list$recent )
+  index.recent <- grep( paste0( "_", station.id, "_" ),
+                       files.list$recent )
   if ( length( index.recent ) > 1 ){
     stop( "More than one recent station matches the station ID!" )
   }
-  index.historical <- grep( station.id, files.list$historical )
+  index.historical <- grep( paste0( "_", station.id, "_" ),
+                           files.list$historical )
   if ( length( index.historical ) > 1 ){
     stop( "More than one historical station matches the station ID!" )
   }
@@ -338,7 +361,8 @@ extract.content.climate <- function( station.id, files.list,
     for ( ll in 2 : length( content.list ) ){
       result.list <- lapply( 1 : length( result.list ), function( rr ){
         ## Add all time stamps, which are not present yet.
-        if ( all( is.na( content.list[[ ll ]][[ rr ]] ) ) ){
+        if ( all( is.na( content.list[[ ll ]][[ rr ]] ) ) ||
+            all( is.na( result.list[[ rr ]] ) ) ){
           ## The c.xts function will complain if one of the objects
           ## solely consists of NAs.
           suppressWarnings({
@@ -446,8 +470,25 @@ import.file.content.climate <- function( file.path ){
 
   ## Use the header of the content file to name the list containing
   ## the results.
-  names( results.list ) <- names( file.data )[
-      seq( 3, ncol( file.data ) - 1 ) ]
+  if ( all( names( file.data ) ==
+            c( "STATIONS_ID", "MESS_DATUM", "QN_3", "FX", "FM",
+              "QN_4", "RSK", "RSKF", "SDK", "SHK_TAG", "NM", "VPM",
+              "PM", "TMK", "UPM", "TXK", "TNK", "TGK", "eor" ) ) ){
+    names( results.list ) <-
+      c( "wind.gust.quality", "wind.gust.max", "wind.gust.mean",
+        "quality.general", "precipitation.height",
+        "precipitation.form", "sunshine.duration", "snow.depth",
+        "cloud.cover.mean", "vapour.pressure.mean", "pressure.mean",
+        "temperature.mean", "relative.humidity.mean",
+        "temperature.2m.max", "temperature.2m.min",
+        "temperature.5cm.min" )
+
+  } else {
+    warning( "Unknown column names in the extracted files" )
+    names( results.list ) <- names( file.data )[
+        seq( 3, ncol( file.data ) - 1 ) ]
+  }
+      
   return( results.list )
 }
 
