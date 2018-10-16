@@ -107,7 +107,8 @@ conversion.climate <- function( files.list, files.description.list,
   if ( !dir.exists( download.folder.historical ) ){
     dir.create( download.folder.historical, recursive = TRUE )
   }
-  
+
+  ## browser()
   extract.content.climate(
       station.id = list.station.ids[[ 1 ]],
       files.list = list( recent = files.list$recent,
@@ -279,110 +280,84 @@ extract.content.climate <- function( station.id, files.list,
   ## Revert the altering of the warning level
   options( warn = old.warning.level )
 
-  ## browser()
-  
-  ## get the path to the .txt files containing the information
-  if ( flag.recent ){
-    recent.file <- paste0( "./TMPrecent/",
-                          grep( "produkt",
-                               list.files("TMPrecent/" ),
-                               value = TRUE ) )
-    if ( length( grep( "produkt",
-                      list.files("TMPrecent/" ),
-                      value = TRUE ) ) == 0 )
-      return( xts( NA, order.by = lubridate::today() ) )
-    ## sometimes an older version is present due to an error
-    ## occurring beforehand those have to be removed (at least from
-    ## the recent.file variable)
-    if ( length( recent.file ) > 1 )
-      recent.file <- recent.file[ grep( station.id, recent.file ) ]
-  }
-  if ( flag.historical ){
-    historical.file <- paste0( "./TMPhistorical/",
-                              grep( "produkt",
-                                   list.files("TMPhistorical/" ),
-                                   value = TRUE ) )
-    if ( length( grep( "produkt",
-                      list.files("TMPhistorical/" ) ) ) == 0 )
-      return( xts( NA, order.by = lubridate::today() ) )
-    ## sometimes an older version is present due to an error
-    ## occurring beforehand those have to be removed (at least from
-    ## the historical.file variable)
-    if ( length( historical.file ) > 1 )
-      historical.file <- historical.file[ grep( station.id,
-                                               historical.file ) ]
-  }
-  ## data.ii will be a data.frame containing all the recent and
-  ## historical data of one station
-  if ( flag.recent ){
-    ## sometimes there is a single delimiter symbol in the last line.
-    ## This causes the read.table function to throw a warning and, if
-    ## the file to read just consists of one line, to
-    ## fail. Therefore it has to be avoided by checking how many
-    ## characters are present in the last line.
-    recent.file.read.lines <- readLines( recent.file )
-    contains.delimiter.recent <-
-      nchar( recent.file.read.lines[
-          length( recent.file.read.lines ) ] ) < 10
-    if ( contains.delimiter.recent ){
-      ## only the last line with the potential delimiter will be
-      ## omitted minus two because of the omitted header
-      data.ii <-
-        utils::read.table(
-                   recent.file, header = TRUE, sep = ";",
-                   nrows = ( length( recent.file.read.lines ) - 2 ) )
+  ## Will contain lists of xts-class objects representing the time
+  ## series extracted from the files.
+  content.list <- list()
+  ## Extract the content from all "produkt_klima_*" files.
+  if ( length( index.recent ) > 0 ){
+    content.files <- grep(
+        "produkt", paste0( download.folder.recent,
+                          list.files( download.folder.recent ) ),
+        value = TRUE )
+    if ( length( content.files ) == 0 ){
+      warning( paste( "No recent produkt_* files found for station",
+                     station.id ) )
     } else {
-      data.ii <- utils::read.table( recent.file, header = TRUE,
-                                   sep = ";" )
-    }
-    if ( flag.historical ){
-      hist.file.read.lines <- readLines( historical.file )
-      contains.delimiter.historical <-
-        nchar( hist.file.read.lines[
-            length( hist.file.read.lines ) ] ) < 10
-      if ( contains.delimiter.historical ){
-        data.hist <-
-          utils::read.table(
-                     historical.file, header = TRUE, sep = ";",
-                     nrows = ( length( hist.file.read.lines ) - 2 ) )
-      } else {
-        data.hist <- utils::read.table( historical.file,
-                                       header = TRUE, sep = ";" )
-      }
-      ## in most cases some data of the recent observations are also
-      ## included in the historical ones. But we of course don't want
-      ## any duplicates
-      suppressWarnings( data.ii <- rbind( data.hist[
-                            -which( data.hist[ , 2 ] %in%
-                                   data.ii[ , 2 ] ), ],
-                            data.ii ) )
-    }
-  } else {
-    hist.file.read.lines <- readLines( historical.file )
-    contains.delimiter.historical <-
-      nchar( hist.file.read.lines[
-          length( hist.file.read.lines ) ] ) < 10
-    if ( contains.delimiter.historical ){
-      data.ii <-
-        utils::read.table(
-                   historical.file, header = TRUE, sep = ";",
-                   nrows = ( length( hist.file.read.lines ) - 2 ) )
-    } else {
-      data.ii <- utils::read.table( historical.file, header = TRUE,
-                                   sep = ";" )
+      ## Append the content of the individual files to the content
+      ## list.
+      content.list <-
+        c( content.list,
+          lapply( content.files, function( ff )
+            import.file.content.climate( ff ) ) )
     }
   }
-  ## delete the auxiliary folders
-  unlink( "./TMPrecent/", recursive = TRUE )
-  unlink( "./TMPhistorical/", recursive = TRUE )
-  ## writing the data into the lists using the xts class
-  results.tmp <- xts( data.ii[ , data.column ],
-                     order.by = convert.date.integer(
-                         data.ii[ , 2 ] ) )
-  ## artifacts in the DWD data base are stored as -999
-  ## these are converted to NA
-  results.tmp[ results.tmp == -999 ] <- NA
-  return( results.tmp )
+  if ( length( index.historical ) > 0 ){
+    content.files <- grep(
+        "produkt", paste0( download.folder.historical,
+                          list.files( download.folder.historical ) ),
+        value = TRUE )
+    if ( length( content.files ) == 0 ){
+      warning( paste( "No historical produkt_* files found for station",
+                     station.id ) )
+    } else {
+      ## Append the content of the individual files to the content
+      ## list.
+      content.list <-
+        c( content.list,
+          lapply( content.files, function( ff )
+            import.file.content.climate( ff ) ) )
+    }
+  }
+
+  ## Check whether all lists are compatible and feature the same
+  ## amount of climatological quantities
+  if ( !all( Reduce( c, lapply( 1 : length( content.list ),
+                               function( ll )
+                                 names( content.list[[ 1 ]] ) ==
+                                 names( content.list[[ ll ]] ) )
+                    ) ) ){
+    warning( paste( "extracted content does not match for station",
+                   station.id ) )
+  }
+  ## Merge all time series concerning one climatological variable into
+  ## one and provide them as a list of class xts elements.
+  ## Start with the first list of results and add all data of the
+  ## latter, which was not part of the former one.
+  result.list <- content.list[[ 1 ]]
+  if ( length( content.list ) > 1 ){
+    for ( ll in 2 : length( content.list ) ){
+      result.list <- lapply( 1 : length( result.list ), function( rr ){
+        ## Add all time stamps, which are not present yet.
+        if ( all( is.na( content.list[[ ll ]][[ rr ]] ) ) ){
+          ## The c.xts function will complain if one of the objects
+          ## solely consists of NAs.
+          suppressWarnings({
+            res <- c( result.list[[ rr ]],
+                     content.list[[ ll ]][[ rr ]][
+                         !index( content.list[[ ll ]][[ rr ]] ) %in%
+                         index( result.list[[ rr ]] ) ] ) })
+        } else {
+            res <- c( result.list[[ rr ]],
+                     content.list[[ ll ]][[ rr ]][
+                         !index( content.list[[ ll ]][[ rr ]] ) %in%
+                         index( result.list[[ rr ]] ) ] )
+        }
+        return( res ) } )
+    }
+  }
+  ## The name got lost during the merging of the content.
+  names( result.list ) <- names( content.list[[ 1 ]] )
+  return( result.list )
 }
 
 
@@ -424,6 +399,56 @@ extract.station.names <- function( station.id, file.description ){
                c( as.numeric( line[ line.last.digit ] ),
                  as.numeric( line[ line.last.digit - 1 ] ),
                  as.numeric( line[ line.last.digit - 2 ] ) ) ) )
+}
+
+##' @title Imports the content of a single produkt file into R
+##' @description It does the actual conversion of the format used by
+##'   the DWD to the \pkg{xts} class. This function is intend to be
+##'   used for aggregated stations data.
+##'
+##' @param file.path Path to a single produkt_* file contained in the
+##'   zip archives of the DWD.
+##'
+##' @return A time series of class \pkg{xts}.
+##' @author Philipp Mueller
+import.file.content.climate <- function( file.path ){
+  ## Sometimes there is a single delimiter symbol in the last line.
+  ## This causes the read.table function to throw a warning and, if
+  ## the file to read just consists of one line, to fail. Therefore,
+  ## it has to be avoided by checking how many characters are present
+  ## in the last line.
+  file.content <- readLines( file.path )
+  if ( nchar( file.content[ length( file.content ) ] ) < 10 ){
+    ## only the last line with the potential delimiter will be
+    ## omitted. Minus two, because we have to omit the header as well.
+    file.data <-
+      utils::read.table(
+                 file.path, header = TRUE, sep = ";",
+                 nrows = ( length( file.content ) - 2 ) )
+  } else {
+    file.data <- utils::read.table( file.path, header = TRUE,
+                                   sep = ";" )
+  }
+  ## Converting the data into a list of xts-class objects. Each data
+  ## column will constitute an element in the list. Since the last
+  ## column only contains the "eor" (end of row) delimiters, it will
+  ## be skipped.
+  results.list <- lapply( seq( 3, ncol( file.data ) - 1 ),
+                         function( rr ){
+                           xts( file.data[ , rr ],
+                               order.by = convert.date.integer(
+                                   file.data[ , 2 ] ) ) } )
+  ## Artifacts in the DWD data base are stored as -999. These will be
+  ## converted to NA (not available).
+  results.list <- lapply( results.list, function( ll ){
+    ll[ ll == -999 ] <- NA
+    return( ll ) } )
+
+  ## Use the header of the content file to name the list containing
+  ## the results.
+  names( results.list ) <- names( file.data )[
+      seq( 3, ncol( file.data ) - 1 ) ]
+  return( results.list )
 }
 
 ##' @title Load a data file into R
