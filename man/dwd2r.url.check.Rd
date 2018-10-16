@@ -4,11 +4,15 @@
 \alias{dwd2r.url.check}
 \title{Checking the validity of URLs}
 \usage{
-dwd2r.url.check(url)
+dwd2r.url.check(url, number.of.tries = 5)
 }
 \arguments{
 \item{url}{Either a simple string or a character vector of several
 URLs.}
+
+\item{number.of.tries}{Numerical value of how often the function
+attempts to test each URL before reporting it to be
+unavailable. Default = 5.}
 }
 \value{
 invisible( TRUE ) if all URLs exist. Throws an error if
@@ -17,6 +21,13 @@ invisible( TRUE ) if all URLs exist. Throws an error if
 \description{
 This helper functions tests whether URLs are
   reachable and throws an error if this is not the case.
+}
+\details{
+The check will be performed \strong{number.of.tries} per
+  URL. The FTP server of the DWD is quite prone to identify the
+  \code{RCurl::url.exists} function as an DDOS attempt. Therefore,
+  one often was to redo the check after some milliseconds (10ms)
+  of waiting.
 }
 \author{
 Philipp Mueller

@@ -3,7 +3,18 @@
 ##'   stations in Germany and extracts minimum and maximum temperature
 ##'   as well as precipitation data.
 ##'
-##' @details 
+##' @description Since this function is agnostic of the type of data
+##'   set picked for download and extraction, a prefix to the file
+##'   names must be provided using \strong{prefix.file.name}. Else,
+##'   the temperatures of e.g. both the hourly and daily data will be
+##'   saved in a file called dwd.temperatures and one overrides the
+##'   other. Instead, it will be saved into
+##'   \emph{dwd.[prefix.file.name].temperatures}.
+##'
+##'   The .csv files will be stored in
+##'   \emph{[download.folder]/csv/[prefix.file.name]} and a separate
+##'   folder will be created for each climatological quantity.
+##'
 ##' @param files.list Named list of character vectors containing
 ##'   absolute paths pointing towards the .zip files downloaded from
 ##'   the DWD FTP server. The names correspond to \emph{recent},
@@ -16,19 +27,38 @@
 ##' @param download.folder This folder will be used to unpack and
 ##'   extract the .zip archives in. It does not have to be the same as
 ##'   the one containing the downloaded content.
+##' @param prefix.file.name String, which will prepend to all save
+##'   files.
 ##' @param quiet Whether or not to display the output generated when
 ##'   downloading the content. Default = FALSE.
 ##' 
 ##' @importFrom xts xts
 ##' 
-##' @return invisible setwd()
+##' @return invisible( TRUE )
 ##' 
 ##' @author Philipp Mueller
 conversion.climate <- function( files.list, files.description.list,
                                csv.export = FALSE, download.folder,
-                               quiet = FALSE ){
-  ## Reading the content of the file containing the description of the
-  ## station data.
+                               prefix.file.name, quiet = FALSE ){
+  ## Ensure the prefix of the file name is a string and contains only
+  ## one slash, which is located at the very end.
+  if ( !is.character( prefix.file.name ) ){
+    stop( "prefix.file.name has to be a string" )
+  }
+  if ( length( grep( "/", prefix.file.name ) ) > 2 ||
+       ( length( grep( "/", prefix.file.name ) ) == 1 &&
+         substr( prefix.file.name, nchar( prefix.file.name ),
+                nchar( prefix.file.name ) ) != "/" ) ){
+    stop(
+        "No '/' delimiter allowed in prefix.file.name except as the very last char" )
+  } else if ( substr( prefix.file.name, nchar( prefix.file.name ),
+                nchar( prefix.file.name ) ) == "/" ){
+    ## If there isn't already a / char present at the end of the
+    ## prefix, add one.
+    prefix.file.name <- gsub( '/', '', prefix.file.name )
+  }
+  ## Reading the content of the file containing the
+  ## description of the station data.
   if ( !is.null( files.description.list$recent ) ){
     file.description.recent <-
       utils::read.table( files.description.list$recent,
@@ -115,8 +145,8 @@ conversion.climate <- function( files.list, files.description.list,
     cat( 'Starting the extraction of the content...\n' )
   }
   stations.content <-
-    lapply( seq( 1 , 10 ), function( ll ){
-      if ( !quiet && ll %% 10 ){
+    lapply( seq( 1 , length( list.station.ids ) ), function( ll ){
+      if ( !quiet && ( ll %% 10 ) == 0 ){
         cat( paste( "Extracting file", ll, "of",
                    length( list.station.ids ), "\n" ) )
       }
@@ -150,75 +180,72 @@ conversion.climate <- function( files.list, files.description.list,
     assign( paste0( "dwd.", names( stations.content[[ 1 ]] )[ qq ] ),
            quantities.content[[ qq ]] )
   }
-
-  browser()
   
   ## assigning the stations names
-  station.extracts <- parallel::mclapply( list.station.ids, function( x )
-    extract.station.names( x, file.description ),
-    mc.cores = parallel::detectCores( logical = FALSE ) )
-  station.names <- Reduce( c, lapply( station.extracts,
-                                     function( x ) x[[ 1 ]] ) )
-  station.positions.aux <- Reduce( rbind, lapply( station.extracts,
-                                                 function( x )
-                                                   x[[ 2 ]] ) )
+  if ( !quiet ){
+    cat( "Extract the name of the stations...\n" )
+  }
+  quantities.info <- lapply( list.station.ids, function( x )
+    extract.station.name.and.location( x, file.description ) )
+  station.names <- Reduce( c, lapply( quantities.info,
+                                     function( ss ) ss$name ) )
+  station.positions <-
+    Reduce( rbind, lapply( quantities.info, function( ss )
+      ss$location ) )
   station.positions <- data.frame(
-      longitude = station.positions.aux[ , 1 ],
-      latitude = station.positions.aux[ , 2 ],
-      altitude = station.positions.aux[ , 3 ],
+      longitude = station.positions[ , 1 ],
+      latitude = station.positions[ , 2 ],
+      altitude = station.positions[ , 3 ],
       name = station.names )
   ## Ordering the stations according to their names in alphabetical
-  ## order
+  ## order.
   station.positions <- station.positions[ order( station.names ), ]
-  ## assigning the names of the stations.
-  ## this new assignment take in the order of 25ms in total
-  for ( ss in paste0( "stations.", data.type ) ){
-    ## Get the variable of the string ss, do a operation on it and
-    ## reassign it to the same name
+  
+  ## Assigning the names of the stations to the lists of the
+  ## climatological quantities.
+  for ( ss in paste0( "dwd.", names( stations.content[[ 1 ]] ) ) ){
+    ## Get the object of the name ss, names its elements according to
+    ## the corresponding stations, and order its content
+    ## alphabetically.
     tmp <- get( ss )
     names( tmp ) <- station.names
-    ## Ordering the stations according to their names in alphabetical
-    ## order
     tmp <- tmp[ order( station.names ) ]
     assign( ss, tmp )
   }
-  ## writing the data to dat files
+
+  ## Writing the data to .csv files
   if ( csv.export ){
-    ## creating a distinct folder for all the different data types
-    for ( dd in data.type ){
-      if ( !dir.exists( paste0( "data_dwd/", dd ) ) )
-        dir.create( paste0( "data_dwd/", dd ) )
-      data.temp <- get( paste0( "stations.", dd ) )
-      for ( ll in 1 : length( data.temp ) )
+    ## Create a distinct folder for each quantity.
+    for ( qq in names( stations.content[[ 1 ]] ) ){
+      if ( !dir.exists( paste0( download.folder, "csv/",
+                               prefix.file.name, '/', qq ) ) ){
+        dir.create( paste0( download.folder, "csv/",
+                           prefix.file.name, '/', qq ),
+                   recursive = TRUE )
+      }
+      tmp <- get( paste0( "dwd.", qq ) )
+      for ( ss in 1 : length( tmp ) )
         utils::write.table( data.frame(
-                   date = index( data.temp[[ ll ]] ),
-                   value = data.temp[[ ll ]], row.names = NULL ),
-                   file = paste0( "data_dwd/", dd, "/",
+                   date = index( tmp[[ ss ]] ),
+                   value = tmp[[ ss ]], row.names = NULL ),
+                   file = paste0( download.folder, 'csv/',
+                                 prefix.file.name, '/', qq, '/',
                                  gsub( "/", "-",
-                                      names( data.temp )[ ll ],
+                                      names( tmp )[ ss ],
                                       fixed = TRUE ), ".csv" ),
                    sep = ",", row.names = FALSE )
     }
-  }   
-  ## delete all folders
-  if ( !save.downloads ){
-    unlink( "./recent/", recursive = TRUE )
-    unlink( "./historical/", recursive = TRUE )
-  }
-  data.name <- data.type
-  ## restore the input value of the selected data types
-  if ( all( data.name == c( "temp.max", "temp.min", "prec" ) ) )
-    data.name <- "default"
+  }  
   ## save the extracted data
-  save( list = c( paste0( "stations.", data.type ),
+  save( list = c( paste0( "dwd.", data.type ),
                  "station.positions" ),
-       file = paste0( "./dwd_",
+       file = paste0( download.folder, "./dwd_",
+                     prefix.file.name, '_',
                      gsub( ".", "-", paste( data.name, 
                                            collapse = "_" ),
                           fixed = TRUE ),
                      ".RData" ) )
-  setwd( old.dir )
-  invisible()
+  invisible( TRUE )
 }
 
 ##' @title Unzips files and extracts the content of DWD source files
@@ -242,8 +269,9 @@ conversion.climate <- function( files.list, files.description.list,
 ##' @param download.folder.historical Folder, which will contain the
 ##'   extracted historical archive.
 ##'
-##' @return A list of \strong{xts}-class objects where each element of
-##'   the list corresponds to one data column in the data files.
+##' @return Named list of \pkg{xts}-class objects where each
+##'   element of the list corresponds to one data column in the data
+##'   files.
 ##' @author Philipp Mueller
 extract.content.climate <- function( station.id, files.list,
                                     download.folder.recent,
@@ -276,7 +304,7 @@ extract.content.climate <- function( station.id, files.list,
                    station.id ) )
     return( NULL )
   }
-    
+  
   ## If the zip file can not be extracted properly the unzip function
   ## will just raise a warning. It has to be converted to an error
   old.warning.level <- getOption( "warn" )
@@ -284,8 +312,8 @@ extract.content.climate <- function( station.id, files.list,
   ## Extract the data
   if ( length( index.recent ) > 0 ){
     try.unzip <- try( utils::unzip( 
-      files.list$recent[ index.recent ],
-      exdir = download.folder.recent ), silent = TRUE )
+                                 files.list$recent[ index.recent ],
+                                 exdir = download.folder.recent ), silent = TRUE )
     if ( class( try.unzip ) == "try-error" ){
       stop( paste( "Unable to extract the recent content of station",
                   station.id ) )
@@ -293,8 +321,8 @@ extract.content.climate <- function( station.id, files.list,
   }
   if ( length( index.historical ) > 0 ){
     try.unzip <- try( utils::unzip(
-      files.list$historical[ index.historical ],
-      exdir = download.folder.historical ), silent = TRUE )
+                                 files.list$historical[ index.historical ],
+                                 exdir = download.folder.historical ), silent = TRUE )
     if ( class( try.unzip ) == "try-error" ){
       stop( paste( "Unable to extract the historical content of station",
                   station.id ) )
@@ -362,7 +390,7 @@ extract.content.climate <- function( station.id, files.list,
       result.list <- lapply( 1 : length( result.list ), function( rr ){
         ## Add all time stamps, which are not present yet.
         if ( all( is.na( content.list[[ ll ]][[ rr ]] ) ) ||
-            all( is.na( result.list[[ rr ]] ) ) ){
+             all( is.na( result.list[[ rr ]] ) ) ){
           ## The c.xts function will complain if one of the objects
           ## solely consists of NAs.
           suppressWarnings({
@@ -371,10 +399,10 @@ extract.content.climate <- function( station.id, files.list,
                          !index( content.list[[ ll ]][[ rr ]] ) %in%
                          index( result.list[[ rr ]] ) ] ) })
         } else {
-            res <- c( result.list[[ rr ]],
-                     content.list[[ ll ]][[ rr ]][
-                         !index( content.list[[ ll ]][[ rr ]] ) %in%
-                         index( result.list[[ rr ]] ) ] )
+          res <- c( result.list[[ rr ]],
+                   content.list[[ ll ]][[ rr ]][
+                       !index( content.list[[ ll ]][[ rr ]] ) %in%
+                       index( result.list[[ rr ]] ) ] )
         }
         return( res ) } )
     }
@@ -384,25 +412,46 @@ extract.content.climate <- function( station.id, files.list,
   return( result.list )
 }
 
-
-extract.station.names <- function( station.id, file.description ){
+##' @title Extract the names and the position of the individual
+##'   stations from the description file.
+##' @description The DWD has a peculiar format for their description
+##'   files. This function will serve as a wrapper to look up the name
+##'   and the location of a station, specified using its
+##'   \strong{station.id}, inside a description file.
+##' 
+##' @param station.id String specifying a station.
+##' @param file.description Path to a description file matching the
+##'   station IDs and their actual names.
+##'
+##' @return A list containing a string with the name of the station
+##'   as one element and a numerical vector of length three (
+##'   longitude, latitude, altitude ) as the second element.
+##' @author Philipp Mueller
+extract.station.name.and.location <- function( station.id,
+                                              file.description ){
   ## The station ID is placed in the first column and the date of
   ## the beginning of the observation period is placed in the second
   ## column. With just one line between the first and second column
-  ## and the necessity of the second to start with either a 1 or a 2
+  ## and the necessity of the second to start with either a 1 or a 2,
   ## the station ID can be extracted uniquely.
   ## The conversion to numeric and back is necessary to delete zeros
   line.raw <- grep( paste0( station.id, " [1,2]" ),
                    file.description, value = TRUE )
-  ## The extraction of the name fails, because the DWD has not yet
-  ## added the station to the Description file holding of the
-  ## stations meta data. This can happen (already happened to me).
   if ( length( line.raw ) == 0 ){
-    ## Show a warning and recommend downloading the newest data.
+    ## The extraction of the name fails, because the DWD has not yet
+    ## added the station to the Description file holding of the
+    ## stations meta data. Or it removed the corresponding line in the
+    ## description file but kept the data.
+    if ( station.id == "00738" ){
+      ## For this station the meta data were removed.
+      return( list( name = "Br\uFCckenau, Bad (A)",
+                   location = c( 9.79, 50.31, 314 ) ) )
+    }
     warning( "Some of the station data are not contained in the overall description file. Please make sure you have the most recent data!" )
     ## Worst case, just delete the corresponding file and download
     ## the new one.
-    return( list( "none", c( 0, 0, 0 ) ) )
+    return( list( name = "unknown",
+                 location = c( NA, NA, NA ) ) )
   }
   ## The name can consist of multiple words. In the previous column
   ## there is a digit and in the next the county consisting of one
@@ -419,10 +468,11 @@ extract.station.names <- function( station.id, file.description ){
   }                             
   ## in the 9th, 8th, 7th entries the stations coordinates are
   ## residing
-  return( list( station.name,
-               c( as.numeric( line[ line.last.digit ] ),
-                 as.numeric( line[ line.last.digit - 1 ] ),
-                 as.numeric( line[ line.last.digit - 2 ] ) ) ) )
+  return( list( name = station.name,
+               location = c( as.numeric( line[ 6 ] ),
+                            as.numeric( line[ 5 ] ),
+                            as.numeric( line[ 4 ] )
+                            ) ) )
 }
 
 ##' @title Imports the content of a single produkt file into R
@@ -488,7 +538,7 @@ import.file.content.climate <- function( file.path ){
     names( results.list ) <- names( file.data )[
         seq( 3, ncol( file.data ) - 1 ) ]
   }
-      
+  
   return( results.list )
 }
 
