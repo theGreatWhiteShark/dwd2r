@@ -577,6 +577,13 @@ source.data <- function( download.folder = NULL, envir = NULL ){
     download.folder <- getOption( "dwd2r.download.path" )
   }
 
+  ## Check whether the download folder exists.
+  if ( !dir.exists( download.folder ) ){
+    stop(
+        "The download.folder has not been created yet.
+ Use the download.data.dwd() function get some data." )
+  }
+
   ## Extract all .RData objects contained in the download path.
   data.path <- list.files( download.folder, pattern = ".RData",
                           recursive = TRUE )
