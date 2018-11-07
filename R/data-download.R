@@ -99,7 +99,8 @@ list.files.in.url <- function( url ){
 ##'
 ##' @export
 ##'
-##' @return \code{invisible( TRUE )}
+##' @return Returns a character vector containing all directories data
+##'   was written to terminated by a '/'.
 ##' @author Philipp Mueller
 download.content <- function( url, download.folder = NULL,
                              quiet = FALSE ){
