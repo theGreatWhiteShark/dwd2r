@@ -23,9 +23,10 @@ extracted recent archive.}
 extracted historical archive.}
 }
 \value{
-Named list of \pkg{xts}-class objects where each
+- Named list of \pkg{xts}-class objects where each
   element of the list corresponds to one data column in the data
   files.
+ - NULL if no data at all could be extracted for the station.
 }
 \description{
 Reads in the content of both the recent and

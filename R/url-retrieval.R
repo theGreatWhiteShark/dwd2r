@@ -1562,7 +1562,7 @@ dwd2r.url.check <- function( url, number.of.tries = 5 ){
   for ( uu in 1 : length( url ) ){
     for ( nn in 1 : number.of.tries ){
       ## Avoid being detect as a bot
-      Sys.sleep( .01 )
+      Sys.sleep( .08 )
       if ( RCurl::url.exists( url[ uu ] ) ){
         break
       }

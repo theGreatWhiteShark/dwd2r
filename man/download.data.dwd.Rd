@@ -6,7 +6,7 @@
 \usage{
 download.data.dwd(save.downloads = TRUE, csv.export = FALSE,
   url = NULL, download.folder = NULL, batch.choices = NULL,
-  quiet = FALSE)
+  quiet = FALSE, debug = FALSE)
 }
 \arguments{
 \item{save.downloads}{If TRUE the downloaded .zip files are stored
@@ -33,6 +33,10 @@ NULL, the choices will be done interactively. Default = NULL.}
 
 \item{quiet}{Whether or not to display the output generated when
 downloading the content. Default = FALSE.}
+
+\item{debug}{If TRUE is enables verbose messages of the individual
+downloads performed within \code{download.content}. Default =
+FALSE.}
 }
 \value{
 invisible( TRUE )

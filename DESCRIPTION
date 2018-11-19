@@ -1,22 +1,20 @@
 Package: dwd2r
 Type: Package
 Title: Automated download and formatting of the data provided by the German weather service (DWD).
+Description: The German weather service (DWD) provides a large data base via a FTP server. But since the is stored in separate compressed archives per station, it is a quite tedious task to download a large set of them, like all daily temperature series throughout Germany, at once. This package tries to give the user a more friendly interface. It lets you choose the data set of choice using a command line interface, which guides you through the folder structure of the FTP server. It will download all content in the selected final notes, and convert the extracted data in a format easily usable within R
 Version: 0.0.1.6000
 Date: 2018-04-03
 LazyData: true
 Authors@R: person("Philipp Mueller", role = c("aut","cre"),
     email = "thetruephil@googlemail.com")
 Maintainer: Philipp Mueller <thetruephil@googlemail.com>
-Description: 
 URL: https://gitlab.com/theGreatWhiteShark/dwd2r
 Depends:
     R(>= 3.3.0),
     xts
 Imports:
+    RCurl,
     lubridate,
-    pander,
-    markdown,
-    parallel,
     zoo
 License: GPL (>= 3) | file LICENSE
 VignetteBuilder: knitr

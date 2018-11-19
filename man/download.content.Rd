@@ -4,7 +4,8 @@
 \alias{download.content}
 \title{Download files from the FTP server of the DWD}
 \usage{
-download.content(url, download.folder = NULL, quiet = FALSE)
+download.content(url, download.folder = NULL, quiet = FALSE,
+  debug = FALSE)
 }
 \arguments{
 \item{url}{Either a character vector of one or more URLs to
@@ -17,9 +18,13 @@ instead. Default = NULL.}
 
 \item{quiet}{Whether or not to verbose the download
 procedure. Default = FALSE.}
+
+\item{debug}{If TRUE is enables verbose messages of the individual
+downloads. Default = FALSE.}
 }
 \value{
-\code{invisible( TRUE )}
+Returns a character vector containing all directories data
+  was written to terminated by a '/'.
 }
 \description{
 Downloads the content of the supplied URL. It is

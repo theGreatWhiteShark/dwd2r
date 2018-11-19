@@ -33,6 +33,7 @@
 ##'   downloading the content. Default = FALSE.
 ##' 
 ##' @importFrom xts xts
+##' @importFrom zoo index
 ##' 
 ##' @return invisible( TRUE )
 ##' 
@@ -142,15 +143,15 @@ conversion.climate <- function( files.list, files.description.list,
   ## xts-class time series and the content of each file (corresponding
   ## to a station) will be an element of the stations.content list.
   if ( !quiet ){
-    cat( 'Starting the extraction of the content...\n' )
+    cat( '\n\nStarting the extraction of the content...\n' )
   }
+
   stations.content <-
     lapply( seq( 1 , length( list.station.ids ) ), function( ll ){
       if ( !quiet && ( ll %% 10 ) == 0 ){
-        cat( paste( "Extracting file", ll, "of",
-                   length( list.station.ids ), "\n" ) )
+        cat( paste0( "\r   Extracting file ", ll, " of ",
+                   length( list.station.ids ), "..." ) )
       }
-      stations.content[[ ll ]] <- 
         extract.content.climate(
             station.id = list.station.ids[[ ll ]],
             files.list = list( recent = files.list$recent,
@@ -158,6 +159,12 @@ conversion.climate <- function( files.list, files.description.list,
             download.folder.recent = download.folder.recent,
             download.folder.historical = download.folder.historical )
     } )
+
+  ## Remove all stations for which no data could have been extracted.
+  list.station.ids <- list.station.ids[
+      !Reduce( c, lapply( stations.content, is.null ) ) ]
+  stations.content <- stations.content[
+      !Reduce( c, lapply( stations.content, is.null ) ) ]
 
   ## Clean up and delete the auxiliary folders used in extraction.
   unlink( download.folder.recent, recursive = TRUE )
@@ -183,7 +190,7 @@ conversion.climate <- function( files.list, files.description.list,
   
   ## assigning the stations names
   if ( !quiet ){
-    cat( "Extract the name of the stations...\n" )
+    cat( "\n\nExtract the name of the stations..." )
   }
   quantities.info <- lapply( list.station.ids, function( x )
     extract.station.name.and.location( x, file.description ) )
@@ -215,8 +222,16 @@ conversion.climate <- function( files.list, files.description.list,
 
   ## Writing the data to .csv files
   if ( csv.export ){
+    if ( !quiet ){
+      cat( "\n\nWrite csv files to disk...\n" )
+    }
     ## Create a distinct folder for each quantity.
-    for ( qq in names( stations.content[[ 1 ]] ) ){
+    for ( qq.idx in 1 : length( stations.content[[ 1 ]] ) ){
+      if ( !quiet && ( qq.idx %% 2 ) == 0 ){
+        cat( paste0( "\r   Writing csv file ", qq.idx, " of ",
+                   length( stations.content[[ 1 ]] ), "..." ) )
+      }
+      qq <- names( stations.content[[ 1 ]] )[ qq.idx ]
       if ( !dir.exists( paste0( download.folder, "csv/",
                                prefix.file.name, '/', qq ) ) ){
         dir.create( paste0( download.folder, "csv/",
@@ -235,16 +250,28 @@ conversion.climate <- function( files.list, files.description.list,
                                       fixed = TRUE ), ".csv" ),
                    sep = ",", row.names = FALSE )
     }
-  }  
-  ## save the extracted data
-  save( list = c( paste0( "dwd.", data.type ),
-                 "station.positions" ),
-       file = paste0( download.folder, "./dwd_",
-                     prefix.file.name, '_',
-                     gsub( ".", "-", paste( data.name, 
-                                           collapse = "_" ),
-                          fixed = TRUE ),
-                     ".RData" ) )
+  }
+
+  ## Save the extracted data in distinct binary objects named
+  ## according to its content.
+  if ( !quiet ){
+    cat( "\n\nWriting converted data to disk...\n" )
+  }
+  for ( qq.idx in 1 : length( stations.content[[ 1 ]] ) ){
+    if ( !quiet && ( qq.idx %% 2 ) == 0 ){
+      cat( paste0( "\r   Writing RData file ", qq.idx, " of ",
+                  length( stations.content[[ 1 ]] ), "..." ) )
+    }
+    qq <- names( stations.content[[ 1 ]] )[ qq.idx ]
+    tmp <- get( paste0( "dwd.", qq ) )
+    save( tmp, station.positions,
+         file = paste0( download.folder, "dwd_",
+                       prefix.file.name, '_',
+                       gsub( ".", "-", paste( qq, 
+                                             collapse = "_" ),
+                            fixed = TRUE ),
+                       ".RData" ) )
+  }
   invisible( TRUE )
 }
 
@@ -269,9 +296,11 @@ conversion.climate <- function( files.list, files.description.list,
 ##' @param download.folder.historical Folder, which will contain the
 ##'   extracted historical archive.
 ##'
-##' @return Named list of \pkg{xts}-class objects where each
+##' @return
+##'  - Named list of \pkg{xts}-class objects where each
 ##'   element of the list corresponds to one data column in the data
 ##'   files.
+##'  - NULL if no data at all could be extracted for the station.
 ##' @author Philipp Mueller
 extract.content.climate <- function( station.id, files.list,
                                     download.folder.recent,
@@ -311,21 +340,25 @@ extract.content.climate <- function( station.id, files.list,
   options( warn = 2 )
   ## Extract the data
   if ( length( index.recent ) > 0 ){
-    try.unzip <- try( utils::unzip( 
-                                 files.list$recent[ index.recent ],
-                                 exdir = download.folder.recent ), silent = TRUE )
+    suppressWarnings(
+        try.unzip <-
+          try( utils::unzip( files.list$recent[ index.recent ],
+                            exdir = download.folder.recent ),
+              silent = TRUE ) )
     if ( class( try.unzip ) == "try-error" ){
-      stop( paste( "Unable to extract the recent content of station",
+      message( paste( "Unable to extract the recent content of station",
                   station.id ) )
     }
   }
   if ( length( index.historical ) > 0 ){
-    try.unzip <- try( utils::unzip(
-                                 files.list$historical[ index.historical ],
-                                 exdir = download.folder.historical ), silent = TRUE )
+    suppressWarnings(
+        try.unzip <-
+          try( utils::unzip( files.list$historical[ index.historical ],
+                            exdir = download.folder.historical ),
+              silent = TRUE ) )
     if ( class( try.unzip ) == "try-error" ){
-      stop( paste( "Unable to extract the historical content of station",
-                  station.id ) )
+      message( paste( "Unable to extract the historical content of station",
+                     station.id ) )
     }
   }
   ## Revert the altering of the warning level
@@ -344,8 +377,9 @@ extract.content.climate <- function( station.id, files.list,
       warning( paste( "No recent produkt_* files found for station",
                      station.id ) )
     } else {
-      ## Append the content of the individual files to the content
-      ## list.
+      ## Append content. The content of the individual produkt files
+      ## will be named list with their lengths corresponding to the
+      ## number of columns containing data.
       content.list <-
         c( content.list,
           lapply( content.files, function( ff )
@@ -368,6 +402,16 @@ extract.content.climate <- function( station.id, files.list,
           lapply( content.files, function( ff )
             import.file.content.climate( ff ) ) )
     }
+  }
+  
+  ## If all archives corresponding to a station are bricked, no
+  ## content could be extracted at all. This happens since the
+  ## download itself can produce artifacts.
+  if ( length( content.list ) == 0 ){
+    warning( paste0(
+        "No time series could be extracted at all for station ",
+        station.id, ". It will be skipped." ) )
+    return( NULL )
   }
 
   ## Check whether all lists are compatible and feature the same
@@ -478,12 +522,15 @@ extract.station.name.and.location <- function( station.id,
 ##' @title Imports the content of a single produkt file into R
 ##' @description It does the actual conversion of the format used by
 ##'   the DWD to the \pkg{xts} class. This function is intend to be
-##'   used for aggregated stations data.
+##'   used for aggregated station data.
 ##'
 ##' @param file.path Path to a single produkt_* file contained in the
 ##'   zip archives of the DWD.
 ##'
-##' @return A time series of class \pkg{xts}.
+##' @return A list of all time series contained in the produkt file
+##'   converted to the \pkg{xts} class and named according to some
+##'   convention of the DWD files or according to the names of the
+##'   corresponding rows.
 ##' @author Philipp Mueller
 import.file.content.climate <- function( file.path ){
   ## Sometimes there is a single delimiter symbol in the last line.

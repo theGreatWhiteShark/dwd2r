@@ -96,6 +96,8 @@ list.files.in.url <- function( url ){
 ##'   instead. Default = NULL.
 ##' @param quiet Whether or not to verbose the download
 ##'   procedure. Default = FALSE.
+##' @param debug If TRUE is enables verbose messages of the individual
+##'   downloads. Default = FALSE.
 ##'
 ##' @export
 ##'
@@ -103,7 +105,7 @@ list.files.in.url <- function( url ){
 ##'   was written to terminated by a '/'.
 ##' @author Philipp Mueller
 download.content <- function( url, download.folder = NULL,
-                             quiet = FALSE ){
+                             quiet = FALSE, debug = FALSE ){
   ## Extract the individual files from the provided URL.
   if ( class( url ) == "character" ){
     url.files <- list.files.in.url( url )
@@ -183,12 +185,22 @@ download.content <- function( url, download.folder = NULL,
   ## Maximum number of tries per file.
   number.of.download.tries <- 10
   ## Download the new files.
-  for ( ff in files.new ){
+  if ( !quiet ){
+    cat( paste( "\nStart downloading", length( files.new ),
+               "files...\n" ) )
+  }
+  for ( ff.idx in 1 : length( files.new ) ){
+    if ( !quiet && ( ff.idx %% 5 ) == 0 ){
+      cat( paste( "\r   Downloading file", ff.idx, "of",
+                 length( files.new ) ) )
+    }
+    ff <- files.new[ ff.idx ]
     wget.try <- try(
         utils::download.file(
                    url = paste0( url.root, ff ),
-                   method = "wget", quiet = quiet,
-                   destfile = paste0( download.folder, ff ) ) )
+                   method = "wget", quiet = !debug,
+                   destfile = paste0( download.folder, ff ) ),
+        silent = !debug )
     ## In case the download did fail because the connection was
     ## refused or wget failed to authenticate, just try again. Usually
     ## these problems are temporary.
@@ -199,10 +211,11 @@ download.content <- function( url, download.folder = NULL,
                wget.try <- try(
                    utils::download.file(
                               url = paste0( url.root, ff ),
-                              method = "wget", quiet = quiet,
+                              method = "wget", quiet = !debug,
                               destfile = paste0( download.folder,
                                                 ff ),
-                              extra = c( "--tries 5" ) ) )
+                              extra = c( "--tries 5" ) ),
+                   silent = !debug )
                current.try <- current.try + 1
              }
       ## Display a warning in case one file couldn't be downloaded at
@@ -266,6 +279,9 @@ download.content <- function( url, download.folder = NULL,
 ##'   NULL, the choices will be done interactively. Default = NULL.
 ##' @param quiet Whether or not to display the output generated when
 ##'   downloading the content. Default = FALSE.
+##' @param debug If TRUE is enables verbose messages of the individual
+##'   downloads performed within \code{download.content}. Default =
+##'   FALSE.
 ##' 
 ##' @export
 ##'
@@ -288,13 +304,19 @@ download.data.dwd <- function( save.downloads = TRUE,
                               url = NULL,
                               download.folder = NULL,
                               batch.choices = NULL,
-                              quiet = FALSE ){
+                              quiet = FALSE, debug = FALSE ){
   ## The folder to put all the temporary files of the dwd2r package in
   ## is set in the options(). To modify it, overwrite the options(
   ## dwd2r.download.path ) in the .Rprofile file in your home
   ## directory
   if ( is.null( download.folder ) ){
     download.folder <- getOption( "dwd2r.download.path" )
+  }
+  ## Ensure the download.folder end with a '/'
+  if ( substring( download.folder,
+                 length( charToRaw( download.folder) ),
+                 length( charToRaw( download.folder) ) ) != "/" ){
+    download.folder <- paste0( download.folder, "/" )
   }
   ## If the folder does not exists yet, create it.
   if ( !dir.exists( download.folder ) ){
@@ -375,7 +397,7 @@ download.data.dwd <- function( save.downloads = TRUE,
                destfile = paste0( download.folder,
                                  subfolders[ indices.recent ],
                                  file.description.recent ),
-               method = "wget", quiet = quiet )
+               method = "wget", quiet = !debug )
   } else {
     file.description.recent <- NULL
   }
@@ -396,7 +418,7 @@ download.data.dwd <- function( save.downloads = TRUE,
                destfile = paste0( download.folder,
                                  subfolders[ indices.historical ],
                                  file.description.historical ),
-               method = "wget", quiet = quiet )
+               method = "wget", quiet = !debug )
   } else {
     file.description.historical <- NULL
   }
@@ -481,7 +503,7 @@ download.data.dwd <- function( save.downloads = TRUE,
                         
   ## If required, delete all files downloaded during this session.
   if ( !save.downloads ){
-    lapply( subfolders, function( ss )
+    lapply( paste0( download.folder, subfolders ), function( ss )
       unlink( ss, recursive = TRUE ) )
   }
   invisible( TRUE )
