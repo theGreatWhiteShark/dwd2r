@@ -277,6 +277,18 @@ download.content <- function( url, download.folder = NULL,
 ##' @param batch.choices Numerical vector containing the numbers,
 ##'   which corresponds to the choices in the interactive mode. If
 ##'   NULL, the choices will be done interactively. Default = NULL.
+##' @param time.series.format Format of the extracted time
+##'   series. They can either be of type \strong{data.frame} and contain two
+##'   columns, "date" and "value", or a time series provided by the
+##'   \pkg{xts} package. Default = "xts".
+##' @param use.geospatial.position.format If FALSE, the object
+##'   containing the geospatial information of all stations will be of
+##'   type data.frame and consists of the columns named
+##'   \emph{longitude}, \emph{latitude}, \emph{altitude}, and
+##'   \emph{name}. If TRUE, an object of class SpatialPointsDataFrame
+##'   will be used instead and \emph{altitude} and \emph{name}
+##'   information can be accessed via the \code{@data}
+##'   attribute. Default = TRUE.
 ##' @param quiet Whether or not to display the output generated when
 ##'   downloading the content. Default = FALSE.
 ##' @param debug If TRUE is enables verbose messages of the individual
@@ -285,7 +297,7 @@ download.content <- function( url, download.folder = NULL,
 ##' 
 ##' @export
 ##'
-##' @examples
+##' @usage
 ##' ## Downloading the aggregated collection of the daily measured
 ##' ## climatic data of the DWD into a local folder, create .csv files
 ##' ## from all the time series, and store the files (to be able to do
@@ -294,17 +306,16 @@ download.content <- function( url, download.folder = NULL,
 ##'                    download.folder = "./local/folder",
 ##'                    batch.choices  = c( 1, 1, 5, 1 ) )
 ##' 
-##' @importFrom xts xts
-##' 
 ##' @return invisible( TRUE )
 ##' 
 ##' @author Philipp Mueller 
-download.data.dwd <- function( save.downloads = TRUE,
-                              csv.export = FALSE,
-                              url = NULL,
-                              download.folder = NULL,
-                              batch.choices = NULL,
-                              quiet = FALSE, debug = FALSE ){
+dwd.download <- function( save.downloads = TRUE, csv.export = FALSE,
+                         url = NULL, download.folder = NULL,
+                         batch.choices = NULL,
+                         time.series.format = c(
+                             "xts", "data.frame" ),
+                         use.geospatial.position.format = TRUE,
+                         quiet = FALSE, debug = FALSE ){
   ## The folder to put all the temporary files of the dwd2r package in
   ## is set in the options(). To modify it, overwrite the options(
   ## dwd2r.download.path ) in the .Rprofile file in your home
@@ -499,7 +510,10 @@ download.data.dwd <- function( save.downloads = TRUE,
                        file.description.diverse ) } ),
       csv.export = csv.export,
       prefix.file.name = prefix.file.name,
-      download.folder = download.folder, quiet = quiet )
+      download.folder = download.folder,
+      time.series.format = time.series.format,
+      use.geospatial.position.format =
+        use.geospatial.position.format, quiet = quiet )
                         
   ## If required, delete all files downloaded during this session.
   if ( !save.downloads ){
