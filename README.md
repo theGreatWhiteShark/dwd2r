@@ -15,6 +15,8 @@
   station
 - All extracted data will be saved in **R**-compatible _.RData_ files
   and, if desired, exported to _.csv_ files as well
+- Caches the downloaded files and only obtains new or altered ones
+  when the download is started again
   
 # Installation
 
@@ -57,6 +59,36 @@ dwd.download( batch.choices = c( 1, 1, 5, 1 ) )
 **NOTE:** For now the internal functions handling the conversion of
 the data have been only tested for this particular choice of data. It
 might fail with a different set of choices.
+
+Once you downloaded some data, you can load them into **R** using
+either the `load()` function directly or by
+
+``` R
+source.data()
+```
+
+This function will list all _.RData_ files in your download directory,
+displays them and their size in your command line, and let's you
+choose one of the files using a command line user interface.
+
+
+# Customization
+
+Per default all data downloaded via the **dwd2r** package will be
+stored in the *R/dwd_data* directory in your home. If you want to
+change this behavior, you can hand over a string specifying the
+path to your favored destination using the _download.folder_ argument
+of the `dwd.download()` and `source.data()` function. 
+
+As an alternative you can also overwrite the global option **dwd2r**
+uses to store its download path in. Just add the following lines to
+the _.Rprofile_ file in your home directory.
+
+``` R
+options( dwd2r.download.path = "PATH" )
+```
+
+All downloads will now be stored in the _PATH_ directory.
 
 ---
 
