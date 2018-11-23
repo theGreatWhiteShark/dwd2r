@@ -6,7 +6,8 @@
   for a single station.}
 \usage{
 extract.content.climate(station.id, files.list, download.folder.recent,
-  download.folder.historical)
+  download.folder.historical, time.series.format = c("xts",
+  "data.frame"))
 }
 \arguments{
 \item{station.id}{String specifying a station.}
@@ -21,11 +22,16 @@ extracted recent archive.}
 
 \item{download.folder.historical}{Folder, which will contain the
 extracted historical archive.}
+
+\item{time.series.format}{Format of the extracted time
+series. They can either be of type \strong{data.frame} and contain two
+columns, "date" and "value", or a time series provided by the
+\pkg{xts} package. Default = "xts".}
 }
 \value{
-- Named list of \pkg{xts}-class objects where each
-  element of the list corresponds to one data column in the data
-  files.
+- Named list of either \pkg{xts}-class or data.frame objects
+  where each element of the list corresponds to one data column in
+  the data files.
  - NULL if no data at all could be extracted for the station.
 }
 \description{
@@ -39,6 +45,19 @@ The station is specified by its \emph{station.id}. The
   \strong{download.folder.recent} or
   \strong{download.folder.historical}. Before extraction all its
   content will be removed.
+}
+\examples{
+  ## The \\pkg{dwd2r} provides some mock data its internal
+  ## functions can be tested and developed with without downloading
+  ## any content from the DWD server. From the package's root
+  ## directory call this function in the following way (be sure to
+  ## create the two folders \\emph{download.folder.recent} and
+  ## \\emph{download.folder.historical} beforehand.
+  dwd2r:::extract.content.climate( "03987",
+    list( historical = "./res/produkt_03987_historical_mock.zip",
+          recent = "./res/produkt_03987_recent_mock.zip" ),
+          download.folder.recent, download.folder.historical, "xts" )
+
 }
 \author{
 Philipp Mueller

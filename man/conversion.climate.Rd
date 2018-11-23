@@ -2,10 +2,12 @@
 % Please edit documentation in R/import.R
 \name{conversion.climate}
 \alias{conversion.climate}
-\title{Downloads data of the DWD}
+\title{Converts the downloaded files into a format usable in R.}
 \usage{
 conversion.climate(files.list, files.description.list,
-  csv.export = FALSE, download.folder, prefix.file.name, quiet = FALSE)
+  csv.export = FALSE, download.folder, prefix.file.name,
+  time.series.format = c("xts", "data.frame"),
+  use.geospatial.position.format = TRUE, quiet = FALSE)
 }
 \arguments{
 \item{files.list}{Named list of character vectors containing
@@ -27,6 +29,20 @@ the one containing the downloaded content.}
 \item{prefix.file.name}{String, which will prepend to all save
 files.}
 
+\item{time.series.format}{Format of the extracted time
+series. They can either be of type \strong{data.frame} and contain two
+columns, "date" and "value", or a time series provided by the
+\pkg{xts} package. Default = "xts".}
+
+\item{use.geospatial.position.format}{If FALSE, the object
+containing the geospatial information of all stations will be of
+type data.frame and consists of the columns named
+\emph{longitude}, \emph{latitude}, \emph{altitude}, and
+\emph{name}. If TRUE, an object of class SpatialPointsDataFrame
+will be used instead and \emph{altitude} and \emph{name}
+information can be accessed via the \code{@data}
+attribute. Default = TRUE.}
+
 \item{quiet}{Whether or not to display the output generated when
 downloading the content. Default = FALSE.}
 }
@@ -34,11 +50,26 @@ downloading the content. Default = FALSE.}
 invisible( TRUE )
 }
 \description{
-Downloads daily weather data from observation
-  stations in Germany and extracts minimum and maximum temperature
-  as well as precipitation data.
+It takes a list of strings pointing to the individual
+  files downloaded from the DWD server, extracts their content,
+  converts it into a format usable within R, extracts additional
+  meta-information about the stations, and stores all of it on the
+  hard disk of the user.
+}
+\details{
+Depending on the data format present in the downloaded
+  files, this function will store more than one file on the hard
+  disk of the user. In case of aggregated data, a separate file
+  per column (climatological quantity) will be saved using the
+  name of the quantity as filename. In all those files in .RData
+  format, two objects will be contained: A named list (using the
+  station names) of all the station data in the format specified
+  by \emph{time.series.format} and an object containing additional
+  meta-information for all stations (their longitude, latitude,
+  and altitude) in a format specified by
+  \emph{time.series.format}.
 
-Since this function is agnostic of the type of data
+  Since this function is agnostic of the type of data
   set picked for download and extraction, a prefix to the file
   names must be provided using \strong{prefix.file.name}. Else,
   the temperatures of e.g. both the hourly and daily data will be
@@ -46,7 +77,8 @@ Since this function is agnostic of the type of data
   other. Instead, it will be saved into
   \emph{dwd.[prefix.file.name].temperatures}.
 
-  The .csv files will be stored in
+  If the user requires and additional storing of all content in
+  .csv files, they will be stored in
   \emph{[download.folder]/csv/[prefix.file.name]} and a separate
   folder will be created for each climatological quantity.
 }

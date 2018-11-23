@@ -4,22 +4,28 @@
 \alias{import.file.content.climate}
 \title{Imports the content of a single produkt file into R}
 \usage{
-import.file.content.climate(file.path)
+import.file.content.climate(file.path, time.series.format = c("xts",
+  "data.frame"))
 }
 \arguments{
 \item{file.path}{Path to a single produkt_* file contained in the
 zip archives of the DWD.}
+
+\item{time.series.format}{Format of the extracted time
+series. They can either be of type \strong{data.frame} and contain two
+columns, "date" and "value", or a time series provided by the
+\pkg{xts} package. Default = "xts".}
 }
 \value{
 A list of all time series contained in the produkt file
-  converted to the \pkg{xts} class and named according to some
-  convention of the DWD files or according to the names of the
-  corresponding rows.
+  converted to the \pkg{xts} or data.frame class and named
+  according to some convention of the DWD files or according to
+  the names of the corresponding rows.
 }
 \description{
 It does the actual conversion of the format used by
-  the DWD to the \pkg{xts} class. This function is intend to be
-  used for aggregated station data.
+  the DWD to the \pkg{xts} or data.frame class. This function is
+  intend to be used for aggregated station data.
 }
 \author{
 Philipp Mueller

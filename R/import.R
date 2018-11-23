@@ -1,9 +1,23 @@
-##' @title Downloads data of the DWD
-##' @description Downloads daily weather data from observation
-##'   stations in Germany and extracts minimum and maximum temperature
-##'   as well as precipitation data.
+##' @title Converts the downloaded files into a format usable in R.
+##' @description It takes a list of strings pointing to the individual
+##'   files downloaded from the DWD server, extracts their content,
+##'   converts it into a format usable within R, extracts additional
+##'   meta-information about the stations, and stores all of it on the
+##'   hard disk of the user.
 ##'
-##' @description Since this function is agnostic of the type of data
+##' @details Depending on the data format present in the downloaded
+##'   files, this function will store more than one file on the hard
+##'   disk of the user. In case of aggregated data, a separate file
+##'   per column (climatological quantity) will be saved using the
+##'   name of the quantity as filename. In all those files in .RData
+##'   format, two objects will be contained: A named list (using the
+##'   station names) of all the station data in the format specified
+##'   by \emph{time.series.format} and an object containing additional
+##'   meta-information for all stations (their longitude, latitude,
+##'   and altitude) in a format specified by
+##'   \emph{time.series.format}.
+##'
+##'   Since this function is agnostic of the type of data
 ##'   set picked for download and extraction, a prefix to the file
 ##'   names must be provided using \strong{prefix.file.name}. Else,
 ##'   the temperatures of e.g. both the hourly and daily data will be
@@ -11,7 +25,8 @@
 ##'   other. Instead, it will be saved into
 ##'   \emph{dwd.[prefix.file.name].temperatures}.
 ##'
-##'   The .csv files will be stored in
+##'   If the user requires and additional storing of all content in
+##'   .csv files, they will be stored in
 ##'   \emph{[download.folder]/csv/[prefix.file.name]} and a separate
 ##'   folder will be created for each climatological quantity.
 ##'
@@ -29,18 +44,40 @@
 ##'   the one containing the downloaded content.
 ##' @param prefix.file.name String, which will prepend to all save
 ##'   files.
+##' @param time.series.format Format of the extracted time
+##'   series. They can either be of type \strong{data.frame} and contain two
+##'   columns, "date" and "value", or a time series provided by the
+##'   \pkg{xts} package. Default = "xts".
+##' @param use.geospatial.position.format If FALSE, the object
+##'   containing the geospatial information of all stations will be of
+##'   type data.frame and consists of the columns named
+##'   \emph{longitude}, \emph{latitude}, \emph{altitude}, and
+##'   \emph{name}. If TRUE, an object of class SpatialPointsDataFrame
+##'   will be used instead and \emph{altitude} and \emph{name}
+##'   information can be accessed via the \code{@data}
+##'   attribute. Default = TRUE.
 ##' @param quiet Whether or not to display the output generated when
 ##'   downloading the content. Default = FALSE.
 ##' 
 ##' @importFrom xts xts
 ##' @importFrom zoo index
+##' @importFrom sp coordinates
 ##' 
 ##' @return invisible( TRUE )
 ##' 
 ##' @author Philipp Mueller
 conversion.climate <- function( files.list, files.description.list,
                                csv.export = FALSE, download.folder,
-                               prefix.file.name, quiet = FALSE ){
+                               prefix.file.name,
+                               time.series.format = c( "xts",
+                                                      "data.frame" ),
+                               use.geospatial.position.format = TRUE,
+                               quiet = FALSE ){
+  ## Sanity checks
+  if ( missing( time.series.format ) ){
+    time.series.format <- "xts"
+  }
+  time.series.format <- match.arg( time.series.format )
   ## Ensure the prefix of the file name is a string and contains only
   ## one slash, which is located at the very end.
   if ( !is.character( prefix.file.name ) ){
@@ -157,7 +194,8 @@ conversion.climate <- function( files.list, files.description.list,
             files.list = list( recent = files.list$recent,
                               historical = files.list$historical ),
             download.folder.recent = download.folder.recent,
-            download.folder.historical = download.folder.historical )
+            download.folder.historical = download.folder.historical,
+            time.series.format = time.series.format )
     } )
 
   ## Remove all stations for which no data could have been extracted.
@@ -204,9 +242,16 @@ conversion.climate <- function( files.list, files.description.list,
       latitude = station.positions[ , 2 ],
       altitude = station.positions[ , 3 ],
       name = station.names )
+  
   ## Ordering the stations according to their names in alphabetical
   ## order.
   station.positions <- station.positions[ order( station.names ), ]
+
+  ## Convert the data.frame containing the spatial information into
+  ## geospatial object native to R
+  if ( use.geospatial.position.format ){
+    sp::coordinates( station.positions ) <- c( "longitude", "latitude" )
+  }
   
   ## Assigning the names of the stations to the lists of the
   ## climatological quantities.
@@ -239,16 +284,31 @@ conversion.climate <- function( files.list, files.description.list,
                    recursive = TRUE )
       }
       tmp <- get( paste0( "dwd.", qq ) )
-      for ( ss in 1 : length( tmp ) )
-        utils::write.table( data.frame(
-                   date = index( tmp[[ ss ]] ),
-                   value = tmp[[ ss ]], row.names = NULL ),
-                   file = paste0( download.folder, 'csv/',
-                                 prefix.file.name, '/', qq, '/',
-                                 gsub( "/", "-",
-                                      names( tmp )[ ss ],
-                                      fixed = TRUE ), ".csv" ),
-                   sep = ",", row.names = FALSE )
+      if ( time.series.format == "xts" ){
+        for ( ss in 1 : length( tmp ) ){
+          utils::write.table( data.frame(
+                     date = index( tmp[[ ss ]] ),
+                     value = tmp[[ ss ]], row.names = NULL ),
+                     file = paste0( download.folder, 'csv/',
+                                   prefix.file.name, '/', qq, '/',
+                                   gsub( "/", "-",
+                                        names( tmp )[ ss ],
+                                        fixed = TRUE ), ".csv" ),
+                     sep = ",", row.names = FALSE )
+        }
+      } else if ( time.series.format == "data.frame" ){
+        for ( ss in 1 : length( tmp ) )
+          rownames( tmp[[ ss ]] ) <- NULL
+          utils::write.table( tmp[[ ss ]],
+                     file = paste0( download.folder, 'csv/',
+                                   prefix.file.name, '/', qq, '/',
+                                   gsub( "/", "-",
+                                        names( tmp )[ ss ],
+                                        fixed = TRUE ), ".csv" ),
+                     sep = ",", row.names = FALSE )
+      } else {
+        stop( "Unknown time series format!" )
+      }
     }
   }
 
@@ -295,16 +355,39 @@ conversion.climate <- function( files.list, files.description.list,
 ##'   extracted recent archive.
 ##' @param download.folder.historical Folder, which will contain the
 ##'   extracted historical archive.
+##' @param time.series.format Format of the extracted time
+##'   series. They can either be of type \strong{data.frame} and contain two
+##'   columns, "date" and "value", or a time series provided by the
+##'   \pkg{xts} package. Default = "xts".
 ##'
+##' @importFrom zoo index
+##'
+##' @examples   ## The \pkg{dwd2r} provides some mock data its internal
+##'   ## functions can be tested and developed with without downloading
+##'   ## any content from the DWD server. From the package's root
+##'   ## directory call this function in the following way (be sure to
+##'   ## create the two folders \emph{download.folder.recent} and
+##'   ## \emph{download.folder.historical} beforehand.
+##'   dwd2r:::extract.content.climate( "03987",
+##'     list( historical = "./res/produkt_03987_historical_mock.zip",
+##'           recent = "./res/produkt_03987_recent_mock.zip" ),
+##'           download.folder.recent, download.folder.historical, "xts" )
+##' 
 ##' @return
-##'  - Named list of \pkg{xts}-class objects where each
-##'   element of the list corresponds to one data column in the data
-##'   files.
+##'  - Named list of either \pkg{xts}-class or data.frame objects
+##'   where each element of the list corresponds to one data column in
+##'   the data files.
 ##'  - NULL if no data at all could be extracted for the station.
 ##' @author Philipp Mueller
 extract.content.climate <- function( station.id, files.list,
                                     download.folder.recent,
-                                    download.folder.historical ){
+                                    download.folder.historical,
+                                    time.series.format = c(
+                                        "xts", "data.frame" ) ) {
+  ## Sanity checks
+  if ( missing( time.series.format ) ){
+    time.series.format <- "xts"
+  }
   ## Compatibility
   if ( length( station.id ) > 1 ){
     stop( "Please provide only one station ID!" )
@@ -383,7 +466,8 @@ extract.content.climate <- function( station.id, files.list,
       content.list <-
         c( content.list,
           lapply( content.files, function( ff )
-            import.file.content.climate( ff ) ) )
+            import.file.content.climate(
+                ff, time.series.format = time.series.format ) ) )
     }
   }
   if ( length( index.historical ) > 0 ){
@@ -400,10 +484,11 @@ extract.content.climate <- function( station.id, files.list,
       content.list <-
         c( content.list,
           lapply( content.files, function( ff )
-            import.file.content.climate( ff ) ) )
+            import.file.content.climate(
+                ff, time.series.format = time.series.format ) ) )
     }
   }
-  
+
   ## If all archives corresponding to a station are bricked, no
   ## content could be extracted at all. This happens since the
   ## download itself can produce artifacts.
@@ -425,30 +510,49 @@ extract.content.climate <- function( station.id, files.list,
                    station.id ) )
   }
   ## Merge all time series concerning one climatological variable into
-  ## one and provide them as a list of class xts elements.
+  ## one and provide them as a list of class xts or data.frame elements.
   ## Start with the first list of results and add all data of the
   ## latter, which was not part of the former one.
   result.list <- content.list[[ 1 ]]
   if ( length( content.list ) > 1 ){
-    for ( ll in 2 : length( content.list ) ){
-      result.list <- lapply( 1 : length( result.list ), function( rr ){
-        ## Add all time stamps, which are not present yet.
-        if ( all( is.na( content.list[[ ll ]][[ rr ]] ) ) ||
-             all( is.na( result.list[[ rr ]] ) ) ){
-          ## The c.xts function will complain if one of the objects
-          ## solely consists of NAs.
-          suppressWarnings({
+    if ( time.series.format == "xts" ){
+      ## Loop over all lists to be merged into result.list
+      for ( ll in 2 : length( content.list ) ){
+        ## Lapply over all climatological variables.
+        result.list <- lapply( 1 : length( result.list ), function( rr ){
+          ## Add all time stamps, which are not present yet.
+          if ( all( is.na( content.list[[ ll ]][[ rr ]] ) ) ||
+               all( is.na( result.list[[ rr ]] ) ) ){
+            ## The c.xts function will complain if one of the objects
+            ## solely consists of NAs.
+            suppressWarnings({
+              res <- c( result.list[[ rr ]],
+                       content.list[[ ll ]][[ rr ]][
+                           !index( content.list[[ ll ]][[ rr ]] ) %in%
+                           index( result.list[[ rr ]] ) ] ) })
+          } else {
             res <- c( result.list[[ rr ]],
                      content.list[[ ll ]][[ rr ]][
                          !index( content.list[[ ll ]][[ rr ]] ) %in%
-                         index( result.list[[ rr ]] ) ] ) })
-        } else {
-          res <- c( result.list[[ rr ]],
-                   content.list[[ ll ]][[ rr ]][
-                       !index( content.list[[ ll ]][[ rr ]] ) %in%
-                       index( result.list[[ rr ]] ) ] )
-        }
-        return( res ) } )
+                         index( result.list[[ rr ]] ) ] )
+          }
+          return( res ) } )
+      }
+    } else if ( time.series.format == "data.frame" ){
+      ## Loop over all lists to be merged into result.list
+      for ( ll in 2 : length( content.list ) ){
+        ## Lapply over all climatological variables.
+        result.list <- lapply( 1 : length( result.list ), function( rr ){
+          ## Add all time stamps, which are not present yet.
+          res <- rbind( result.list[[ rr ]],
+                       content.list[[ ll ]][[ rr ]][
+                           !content.list[[ ll ]][[ rr ]]$date %in%
+                           result.list[[ rr ]]$date,  ] )
+          
+          return( res ) } )
+      }
+    } else {
+      stop( "Unknown time series format!" )
     }
   }
   ## The name got lost during the merging of the content.
@@ -521,18 +625,30 @@ extract.station.name.and.location <- function( station.id,
 
 ##' @title Imports the content of a single produkt file into R
 ##' @description It does the actual conversion of the format used by
-##'   the DWD to the \pkg{xts} class. This function is intend to be
-##'   used for aggregated station data.
+##'   the DWD to the \pkg{xts} or data.frame class. This function is
+##'   intend to be used for aggregated station data.
 ##'
 ##' @param file.path Path to a single produkt_* file contained in the
 ##'   zip archives of the DWD.
+##' @param time.series.format Format of the extracted time
+##'   series. They can either be of type \strong{data.frame} and contain two
+##'   columns, "date" and "value", or a time series provided by the
+##'   \pkg{xts} package. Default = "xts".
 ##'
+##' @import xts
+##' 
 ##' @return A list of all time series contained in the produkt file
-##'   converted to the \pkg{xts} class and named according to some
-##'   convention of the DWD files or according to the names of the
-##'   corresponding rows.
+##'   converted to the \pkg{xts} or data.frame class and named
+##'   according to some convention of the DWD files or according to
+##'   the names of the corresponding rows.
 ##' @author Philipp Mueller
-import.file.content.climate <- function( file.path ){
+import.file.content.climate <- function( file.path,
+                                        time.series.format = c(
+                                            "xts", "data.frame" ) ){
+  ## Sanity checks
+  if ( missing( time.series.format ) ){
+    time.series.format <- "xts"
+  }
   ## Sometimes there is a single delimiter symbol in the last line.
   ## This causes the read.table function to throw a warning and, if
   ## the file to read just consists of one line, to fail. Therefore,
@@ -554,16 +670,34 @@ import.file.content.climate <- function( file.path ){
   ## column will constitute an element in the list. Since the last
   ## column only contains the "eor" (end of row) delimiters, it will
   ## be skipped.
-  results.list <- lapply( seq( 3, ncol( file.data ) - 1 ),
-                         function( rr ){
-                           xts( file.data[ , rr ],
-                               order.by = convert.date.integer(
-                                   file.data[ , 2 ] ) ) } )
-  ## Artifacts in the DWD data base are stored as -999. These will be
-  ## converted to NA (not available).
-  results.list <- lapply( results.list, function( ll ){
-    ll[ ll == -999 ] <- NA
-    return( ll ) } )
+  if ( time.series.format == "xts" ){
+    results.list <- lapply( seq( 3, ncol( file.data ) - 1 ),
+                           function( rr ){
+                             xts( file.data[ , rr ],
+                                 order.by = convert.date.integer(
+                                     file.data[ , 2 ] ) ) } )
+  
+    ## Artifacts in the DWD data base are stored as -999. These will be
+    ## converted to NA (not available).
+    results.list <- lapply( results.list, function( ll ){
+      ll[ ll == -999 ] <- NA
+      return( ll ) } )
+  } else if ( time.series.format == "data.frame" ){
+    results.list <- lapply( seq( 3, ncol( file.data ) - 1 ),
+                           function( rr )
+                             data.frame(
+                                 date = convert.date.integer(
+                                     file.data[ , 2 ] ),
+                                 value = file.data[ , rr ] ) )
+  
+    ## Artifacts in the DWD data base are stored as -999. These will be
+    ## converted to NA (not available).
+    results.list <- lapply( results.list, function( ll ){
+      ll$value[ ll$value == -999 ] <- NA
+      return( ll ) } )
+  } else {
+    stop( "Unknown time series format!" )
+  }
 
   ## Use the header of the content file to name the list containing
   ## the results.
@@ -628,7 +762,7 @@ source.data <- function( download.folder = NULL, envir = NULL ){
   if ( !dir.exists( download.folder ) ){
     stop(
         "The download.folder has not been created yet.
- Use the download.data.dwd() function get some data." )
+ Use the dwd.download() function get some data." )
   }
 
   ## Extract all .RData objects contained in the download path.
