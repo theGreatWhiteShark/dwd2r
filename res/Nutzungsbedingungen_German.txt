@@ -1,0 +1,19 @@
+﻿Copyright für Daten auf dem CDC FTP-Server
+
+Die Klimadaten im frei zugänglichen Bereich des CDC FTP-Servers sind urheberrechtlich geschützt.
+Die frei zugänglichen Daten dürfen entsprechend der "Verordnung zur Festlegung der Nutzungsbestimmungen für die Bereitstellung von Geodaten des Bundes (GeoNutzV)" unter Beigabe eines Quellenvermerks ohne Einschränkungen weiterverwendet werden. Im Hinblick auf die Gestaltung der Quellenvermerke fordert der DWD (gemäß § 7 DWD-Gesetz, § 3 GeoNutzV) zur Beachtung nachfolgender Hinweise auf:
+
+• Die Pflicht zur Einbindung beigegebener Quellenvermerke gilt für die unveränderte Verwendung von Geodaten und anderer Leistungen des DWD. Auch bei Bildung von Auszügen oder Änderung des Datenformats sind Quellenvermerke einzubinden. Eine Abbildung des DWD-Logos ist als Quellenvermerk im Sinne der GeoNutzV ausreichend.
+• Bei weitergehenden Veränderungen, Bearbeitungen, neuen Gestaltungen oder sonstigen Abwandlungen erwartet der DWD mindestens eine Nennung des DWD in zentralen Quellenverzeichnissen oder im Impressum.
+• Veränderungshinweise gemäß GeoNutzV können z. B. lauten: "Datenbasis: Deutscher Wetterdienst, Rasterdaten bildlich wiedergegeben", "Datenbasis: Deutscher Wetterdienst, Einzelwerte gemittelt" oder "Datenbasis: Deutscher Wetterdienst, eigene Elemente ergänzt".
+• Bei einer Verwendung, die nicht der Zweckbestimmung der Leistung des DWD gerecht wird, sind beigegebene Quellenvermerke zu löschen. Das gilt insbesondere für Wetterwarnungen, wenn nicht sichergestellt ist, dass diese jederzeit vollständig und unverzüglich allen Nutzern zur Verfügung gestellt werden.
+
+Hier (http://www.dwd.de/DE/service/copyright/vorlagen_quellenangabe.html?nn=450672) finden Sie entsprechende Erläuterungen und Vorlagen für die Umsetzung.
+
+Der Deutsche Wetterdienst versichert, über die erforderlichen Rechte zu verfügen, falls Informationen Dritter zur Erstellung eigener Leistungen verwendet werden:
+Quelle für Geobasisdaten: Vermessungsverwaltungen der Länder und BKG (http://www.bkg.bund.de)
+Quellen für Satellitendaten: EUMETSAT (http://www.eumetsat.int), NOAA (http://www.noaa.gov)
+
+Die in den Datensatzbeschreibungen aufgeführten Copyright-Bedingungen sind zu beachten.
+
+

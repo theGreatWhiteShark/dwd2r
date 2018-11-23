@@ -1,0 +1,16 @@
+﻿Terms of use for data on the CDC ftp server
+Please note: This English translation is intended as a convenience to non-German-reading customers and has no legal effect for compliance or enforcement purposes. Only the German version shall be legally binding.
+All data in the freely accessible area of the CDC’s ftp server are protected by copyright.
+The freely accessible data may be re-used without any restrictions provided that the source reference is indicated, as laid down in the GeoNutzV ordinance ("Verordnung zur Festlegung der Nutzungsbestimmungen für die Bereitstellung von Geodaten des Bundes = Ordinance to Determine the Conditions for Use for the Provision of Spatial Data of the Federation). As to the layout of source references, the DWD requests adherence to the following guidelines (cf. § 7 of the DWD Law and § 3 of the GeoNutzV ordinance):
+• The obligation to indicate the enclosed source references shall apply to any spatial data and other services of the DWD that are used without alteration. Source references must also be indicated even if extracts or excerpts are used or if the data format has been changed. Displaying the DWD logo shall be considered as meeting the requirement of source reference in meaning of the GeoNutzV ordinance.
+• In the event of more advanced alteration, processing, new design or other adaptation, DWD at least expects to be mentioned in a central list of references or in an imprint.
+• Indication of alteration according to the GeoNutzV ordinance may read as follows: "Data basis: Deutscher Wetterdienst, gridded data reproduced graphically"; "Data basis: Deutscher Wetterdienst, averaged over individual values", or "Data basis: Deutscher Wetterdienst, own elements added".
+• If a service provided by the DWD is used in a way that does not comply with its intended purpose, the enclosed source references have to be deleted. This shall especially apply to weather warnings for which there is no guarantee that they are delivered to all users at all times completely and without delay.
+You can find examples here: http://www.dwd.de/DE/service/copyright/vorlagen_quellenangabe.html?nn=450672
+Wherever data or information from third parties is used for the generation of DWD-own products and services, the Deutscher Wetterdienst assures that it holds all necessary rights to do so.
+Source of geospatial base data: Surveying authorities of the Länder and Federal Agency for Cartography and Geodesy (http://www.bkg.bund.de).
+Source of satellite data: EUMETSAT (http://www.eumetsat.int), NOAA (http://www.noaa.gov).
+Please ensure the copyright conditions stated in the data set descriptions are met.
+
+
+
