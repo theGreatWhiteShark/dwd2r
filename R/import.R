@@ -298,7 +298,6 @@ conversion.climate <- function( files.list, files.description.list,
         }
       } else if ( time.series.format == "data.frame" ){
         for ( ss in 1 : length( tmp ) )
-          rownames( tmp[[ ss ]] ) <- NULL
           utils::write.table( tmp[[ ss ]],
                      file = paste0( download.folder, 'csv/',
                                    prefix.file.name, '/', qq, '/',
