@@ -1,33 +1,33 @@
-##' @title Converts the downloaded files into a format usable in R.
+##' @title Converts the downloaded files into a format usable within R
 ##' @description It takes a list of strings pointing to the individual
 ##'   files downloaded from the DWD server, extracts their content,
-##'   converts it into a format usable within R, extracts additional
-##'   meta-information about the stations, and stores all of it on the
-##'   hard disk of the user.
+##'   converts it into a format usable within R. In addition, it also
+##'   extracts meta-information about the stations and
+##'   stores all of it on the hard disk of the user.
 ##'
 ##' @details Depending on the data format present in the downloaded
 ##'   files, this function will store more than one file on the hard
 ##'   disk of the user. In case of aggregated data, a separate file
 ##'   per column (climatological quantity) will be saved using the
-##'   name of the quantity as filename. In all those files in .RData
-##'   format, two objects will be contained: A named list (using the
-##'   station names) of all the station data in the format specified
-##'   by \emph{time.series.format} and an object containing additional
-##'   meta-information for all stations (their longitude, latitude,
-##'   and altitude) in a format specified by
-##'   \emph{time.series.format}.
+##'   name of the quantity as filename. In all those files in
+##'   \strong{.RData} format, two objects will be contained: A named
+##'   list (using the station names) of all the station data in the
+##'   format specified by \code{time.series.format} and an object
+##'   containing additional meta-information for all stations (their
+##'   longitude, latitude, and altitude) in a format specified by
+##'   \code{use.geospatial.position.format}.
 ##'
 ##'   Since this function is agnostic of the type of data
 ##'   set picked for download and extraction, a prefix to the file
-##'   names must be provided using \strong{prefix.file.name}. Else,
-##'   the temperatures of e.g. both the hourly and daily data will be
+##'   names must be provided using \code{prefix.file.name}. Else,
+##'   the temperatures of, e.g., both the hourly and daily data will be
 ##'   saved in a file called dwd.temperatures and one overrides the
 ##'   other. Instead, it will be saved into
-##'   \emph{dwd.[prefix.file.name].temperatures}.
+##'   \code{dwd.[prefix.file.name].temperatures}.
 ##'
-##'   If the user requires and additional storing of all content in
+##'   If the user requires an additional storing of all content in
 ##'   .csv files, they will be stored in
-##'   \emph{[download.folder]/csv/[prefix.file.name]} and a separate
+##'   \code{[download.folder]/csv/[prefix.file.name]} and a separate
 ##'   folder will be created for each climatological quantity.
 ##'
 ##' @param files.list Named list of character vectors containing
@@ -35,27 +35,28 @@
 ##'   the DWD FTP server. The names correspond to \emph{recent},
 ##'   \emph{historical}, and \emph{diverse}.
 ##' @param files.description.list Named list of the corresponding
-##'   description files. One for each element in \strong{files.list}.
-##' @param csv.export If TRUE creates an additional folder containing
-##'   .csv files with the individual station data. Using this the data
-##'   can be used outside of R too. Default = FALSE.
+##'   description files. One for each element in \code{files.list}.
+##' @param csv.export If TRUE, the function creates an additional
+##'   folder containing .csv files with the individual station
+##'   data. Using them, the data can be accessed outside of R
+##'   too. Default = FALSE.
 ##' @param download.folder This folder will be used to unpack and
-##'   extract the .zip archives in. It does not have to be the same as
-##'   the one containing the downloaded content.
-##' @param prefix.file.name String, which will prepend to all save
-##'   files.
+##'   extract the \emph{.zip} archives in. It does not have to be the
+##'   same as the one containing the downloaded content.
+##' @param prefix.file.name String, which will be prepended to all
+##'   saved files.
 ##' @param time.series.format Format of the extracted time
-##'   series. They can either be of type \strong{data.frame} and contain two
-##'   columns, "date" and "value", or a time series provided by the
-##'   \pkg{xts} package. Default = "xts".
+##'   series. They can either be of type \strong{data.frame} and
+##'   contain two columns, "date" and "value", or a time series
+##'   provided by the \pkg{xts} package. Default = "xts".
 ##' @param use.geospatial.position.format If FALSE, the object
 ##'   containing the geospatial information of all stations will be of
-##'   type data.frame and consists of the columns named
+##'   type \strong{data.frame} and consist of the columns named
 ##'   \emph{longitude}, \emph{latitude}, \emph{altitude}, and
-##'   \emph{name}. If TRUE, an object of class SpatialPointsDataFrame
-##'   will be used instead and \emph{altitude} and \emph{name}
-##'   information can be accessed via the \code{@data}
-##'   attribute. Default = TRUE.
+##'   \emph{name}. If TRUE, an object of class
+##'   \code{\link[sp]{SpatialPointsDataFrame}} will be used instead
+##'   and the \emph{altitude} and \emph{name} information can be
+##'   accessed via the \code{@data} attribute. Default = TRUE.
 ##' @param quiet Whether or not to display the output generated when
 ##'   downloading the content. Default = FALSE.
 ##' 
@@ -63,7 +64,7 @@
 ##' @importFrom zoo index
 ##' @importFrom sp coordinates
 ##' 
-##' @return invisible( TRUE )
+##' @return \code{invisible( TRUE )}
 ##' 
 ##' @author Philipp Mueller
 conversion.climate <- function( files.list, files.description.list,
@@ -334,15 +335,15 @@ conversion.climate <- function( files.list, files.description.list,
   invisible( TRUE )
 }
 
-##' @title Unzips files and extracts the content of DWD source files
-##'   for a single station.
+##' @title Unzips and extracts the content of DWD source files
+##'   for a single station
 ##' @description Reads in the content of both the recent and
 ##'   historical files corresponding to a single station, combines
 ##'   its data, and converts it into a format R can handle.
-##' @details The station is specified by its \emph{station.id}. The
+##' @details The station is specified by its \code{station.id}. The
 ##'   extraction will take place in either
-##'   \strong{download.folder.recent} or
-##'   \strong{download.folder.historical}. Before extraction all its
+##'   \code{download.folder.recent} or
+##'   \code{download.folder.historical}. Before extraction all its
 ##'   content will be removed.
 ##'
 ##' @param station.id String specifying a station.
@@ -361,21 +362,21 @@ conversion.climate <- function( files.list, files.description.list,
 ##'
 ##' @importFrom zoo index
 ##'
-##' @examples   ## The \pkg{dwd2r} provides some mock data its internal
-##'   ## functions can be tested and developed with without downloading
-##'   ## any content from the DWD server. From the package's root
+##' @examples ## The \pkg{dwd2r} provides some mock data so its internal
+##'   ## functions can be tested and developed without downloading
+##'   ## any content from the DWD server. At the package's root
 ##'   ## directory call this function in the following way (be sure to
-##'   ## create the two folders \emph{download.folder.recent} and
-##'   ## \emph{download.folder.historical} beforehand.
+##'   ## create the two folders \code{download.folder.recent} and
+##'   ## \code{download.folder.historical} beforehand).
 ##'   dwd2r:::extract.content.climate( "03987",
 ##'     list( historical = "./res/produkt_03987_historical_mock.zip",
 ##'           recent = "./res/produkt_03987_recent_mock.zip" ),
 ##'           download.folder.recent, download.folder.historical, "xts" )
 ##' 
 ##' @return
-##'  - Named list of either \pkg{xts}-class or data.frame objects
-##'   where each element of the list corresponds to one data column in
-##'   the data files.
+##'  - Named list of either \pkg{xts}-class or \strong{data.frame}
+##'   objects where each element of the list corresponds to one
+##'   column in the data files.
 ##'  - NULL if no data at all could be extracted for the station.
 ##' @author Philipp Mueller
 extract.content.climate <- function( station.id, files.list,
@@ -560,19 +561,19 @@ extract.content.climate <- function( station.id, files.list,
 }
 
 ##' @title Extract the names and the position of the individual
-##'   stations from the description file.
+##'   stations from the description file
 ##' @description The DWD has a peculiar format for their description
 ##'   files. This function will serve as a wrapper to look up the name
 ##'   and the location of a station, specified using its
-##'   \strong{station.id}, inside a description file.
+##'   \code{station.id}, inside a description file.
 ##' 
 ##' @param station.id String specifying a station.
-##' @param file.description Path to a description file matching the
-##'   station IDs and their actual names.
+##' @param file.description Path to a description file linking the
+##'   station IDs to their actual names.
 ##'
 ##' @return A list containing a string with the name of the station
-##'   as one element and a numerical vector of length three (
-##'   longitude, latitude, altitude ) as the second element.
+##'   as one element and a numerical vector of length three
+##'   ( longitude, latitude, altitude ) as the second element.
 ##' @author Philipp Mueller
 extract.station.name.and.location <- function( station.id,
                                               file.description ){
@@ -624,8 +625,8 @@ extract.station.name.and.location <- function( station.id,
 
 ##' @title Imports the content of a single produkt file into R
 ##' @description It does the actual conversion of the format used by
-##'   the DWD to the \pkg{xts} or data.frame class. This function is
-##'   intend to be used for aggregated station data.
+##'   the DWD to the \pkg{xts} or \strong{data.frame} class. This
+##'   function is intend to be used for aggregated station data.
 ##'
 ##' @param file.path Path to a single produkt_* file contained in the
 ##'   zip archives of the DWD.
@@ -637,9 +638,9 @@ extract.station.name.and.location <- function( station.id,
 ##' @import xts
 ##' 
 ##' @return A list of all time series contained in the produkt file
-##'   converted to the \pkg{xts} or data.frame class and named
-##'   according to some convention of the DWD files or according to
-##'   the names of the corresponding rows.
+##'   converted to the \pkg{xts} or \strong{data.frame} class and
+##'   named according to some convention of the DWD files or according
+##'   to the names of the corresponding rows.
 ##' @author Philipp Mueller
 import.file.content.climate <- function( file.path,
                                         time.series.format = c(
@@ -724,29 +725,29 @@ import.file.content.climate <- function( file.path,
 
 ##' @title Load a data file into R
 ##' @description Searches the \emph{~/R/dwd_data/} directory or a
-##'   specified folder for .RData files recursively and displays the
-##'   user its findings for her to choose one of them.
+##'   specified folder for \emph{.RData} files recursively and
+##'   displays its findings so the user can choose one of them.
 ##' @details In order to use the data with the \pkg{climex} package,
 ##'   it should be of class \pkg{xts} or of lists of class \pkg{xts}
 ##'   objects.
 ##'
-##'   You can use the \pkg{dwd2r} package to download and use the
-##'   daily station data provided by the German weather service.
+##'   If you do not have any data yet, use the
+##'   \code{\link{dwd.download}} function to get some.
 ##'
 ##' @param download.folder Specifies the folder in which the function
-##'   will look for .RData files recursively. Per default the
-##'   \emph{R/dwd_data/} directory in your home folder will be
+##'   will look for \emph{.RData} files recursively. Per default the
+##'   \emph{R/dwd_data/} directory in the home folder will be
 ##'   used. You can overwrite this behavior by setting \code{options(
-##'   dwd2r.download.path = "PATH" )} in your \emph{.Rprofile} path in
-##'   your home.
+##'   dwd2r.download.path = "PATH" )} in the \emph{.Rprofile}
+##'   configuration file in your home.
 ##' @param envir Environment the data will be attached to. If not
 ##'   specified, the data will be loaded to the environment the
 ##'   function is called from. Default = NULL.
 ##' @family import
 ##'  
 ##' @export
-##' @return Returns invisible but attaches the chosen .RData file to
-##'   the specified R environment.
+##' @return \code{invisible()} but attaches the content of the chosen
+##'   \emph{.RData} file to the specified R environment.
 ##' @author Philipp Mueller
 source.data <- function( download.folder = NULL, envir = NULL ){
   ## The folder to put all the temporary files of the dwd2r

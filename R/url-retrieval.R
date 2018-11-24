@@ -5,12 +5,12 @@
 ##' @description Interactive function to extract the download URLs of the
 ##'   FTP server of the DWD
 ##' @details Since there is A LOT of different data provided by
-##'   the German weather service (DWD), it makes not sense to specify
+##'   the German weather service (DWD), it makes no sense to specify
 ##'   them all using input arguments to this function. Instead, the
 ##'   user will be guided interactively through the different data
 ##'   sources and specifies the data she want using the inputs at the
 ##'   prompt. If you prefer to run the function non-interactive, you
-##'   can use the \emph{batch.choices} argument and supply a vector of
+##'   can use the \code{batch.choices} argument and supply a vector of
 ##'   numbers corresponding to your choices.
 ##'
 ##'   As another option, you can use the \code{\link{cat.dwd.ftp.url}}
@@ -27,10 +27,9 @@
 ##'   \url{ftp://ftp-cdc.dwd.de/pub/CDC/Terms_of_use.pdf}!
 ##'
 ##' @param batch.choices Numerical vector containing the numbers,
-##'   which corresponds to the choices in the interactive mode. If
-##'   NULL, the choices will be done interactively. Default = NULL.
-##'
-##' @export
+##'   which correspond to the choices in the interactive mode. If
+##'   NULL, the choices will be selected interactively. Default =
+##'   NULL.
 ##'
 ##' @examples
 ##' ## Get the URLs pointing to the aggregated collection of the daily
@@ -39,14 +38,14 @@
 ##'
 ##' @return List containing to two elements
 ##'   \itemize{
-##'     \item{ \emph{data} - a character vector containing one or more
-##'              URLs pointing to the different data folders. }
-##'     \item{ \emph{meta} - character vector pointing to the folder
+##'     \item{\code{data} - A character vector containing one or more
+##'              URLs pointing to the different data folders on the
+##'              FTP servers of the DWD}
+##'     \item{\code{meta} - A character vector pointing to the folder
 ##'              containing the meta data. Or NULL if there is no
-##'              distinct folder and the meta data are contained in
-##'              the folders present in the \emph{data} URLs } 
+##'              distinct folder and the meta data is contained in
+##'              the folders present in the \code{data} URLs} 
 ##'   }
-##'
 ##' @family dwd-urls
 ##' @author Philipp Mueller
 get.dwd.ftp.url <- function( batch.choices = NULL ){
@@ -1538,13 +1537,13 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
 }
 
 ##' @title Checking the validity of URLs
-##' @description This helper functions tests whether URLs are
-##'   reachable and throws an error if this is not the case.
-##' @details The check will be performed \strong{number.of.tries} per
+##' @description This helper function tests whether URLs are reachable
+##'   and throws an error if this is not the case.
+##' @details The check will be performed \code{number.of.tries} per
 ##'   URL. The FTP server of the DWD is quite prone to identify the
-##'   \code{RCurl::url.exists} function as an DDOS attempt. Therefore,
-##'   one often was to redo the check after some milliseconds (10ms)
-##'   of waiting.
+##'   \code{\link[RCurl]{url.exists}} function as an DDOS attempt.
+##'   Therefore, one often was to redo the check after some
+##'   milliseconds (10ms) of waiting.
 ##' 
 ##' @param url Either a simple string or a character vector of several
 ##'   URLs.
@@ -1554,8 +1553,8 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
 ##'
 ##' @importFrom RCurl url.exists
 ##'
-##' @return invisible( TRUE ) if all URLs exist. Throws an error if
-##'   not. 
+##' @return \code{invisible( TRUE )} if all URLs exist. Throws an
+##'   error if not.
 ##' @author Philipp Mueller
 dwd2r.url.check <- function( url, number.of.tries = 5 ){
   ## Test the URL collected so far.

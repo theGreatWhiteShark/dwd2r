@@ -15,19 +15,19 @@ attempts to test each URL before reporting it to be
 unavailable. Default = 5.}
 }
 \value{
-invisible( TRUE ) if all URLs exist. Throws an error if
-  not.
+\code{invisible( TRUE )} if all URLs exist. Throws an
+  error if not.
 }
 \description{
-This helper functions tests whether URLs are
-  reachable and throws an error if this is not the case.
+This helper function tests whether URLs are reachable
+  and throws an error if this is not the case.
 }
 \details{
-The check will be performed \strong{number.of.tries} per
+The check will be performed \code{number.of.tries} per
   URL. The FTP server of the DWD is quite prone to identify the
-  \code{RCurl::url.exists} function as an DDOS attempt. Therefore,
-  one often was to redo the check after some milliseconds (10ms)
-  of waiting.
+  \code{\link[RCurl]{url.exists}} function as an DDOS attempt.
+  Therefore, one often was to redo the check after some
+  milliseconds (10ms) of waiting.
 }
 \author{
 Philipp Mueller

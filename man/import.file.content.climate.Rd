@@ -18,14 +18,14 @@ columns, "date" and "value", or a time series provided by the
 }
 \value{
 A list of all time series contained in the produkt file
-  converted to the \pkg{xts} or data.frame class and named
-  according to some convention of the DWD files or according to
-  the names of the corresponding rows.
+  converted to the \pkg{xts} or \strong{data.frame} class and
+  named according to some convention of the DWD files or according
+  to the names of the corresponding rows.
 }
 \description{
 It does the actual conversion of the format used by
-  the DWD to the \pkg{xts} or data.frame class. This function is
-  intend to be used for aggregated station data.
+  the DWD to the \pkg{xts} or \strong{data.frame} class. This
+  function is intend to be used for aggregated station data.
 }
 \author{
 Philipp Mueller

@@ -8,32 +8,32 @@ source.data(download.folder = NULL, envir = NULL)
 }
 \arguments{
 \item{download.folder}{Specifies the folder in which the function
-will look for .RData files recursively. Per default the
-\emph{R/dwd_data/} directory in your home folder will be
+will look for \emph{.RData} files recursively. Per default the
+\emph{R/dwd_data/} directory in the home folder will be
 used. You can overwrite this behavior by setting \code{options(
-dwd2r.download.path = "PATH" )} in your \emph{.Rprofile} path in
-your home.}
+dwd2r.download.path = "PATH" )} in the \emph{.Rprofile}
+configuration file in your home.}
 
 \item{envir}{Environment the data will be attached to. If not
 specified, the data will be loaded to the environment the
 function is called from. Default = NULL.}
 }
 \value{
-Returns invisible but attaches the chosen .RData file to
-  the specified R environment.
+\code{invisible()} but attaches the content of the chosen
+  \emph{.RData} file to the specified R environment.
 }
 \description{
 Searches the \emph{~/R/dwd_data/} directory or a
-  specified folder for .RData files recursively and displays the
-  user its findings for her to choose one of them.
+  specified folder for \emph{.RData} files recursively and
+  displays its findings so the user can choose one of them.
 }
 \details{
 In order to use the data with the \pkg{climex} package,
   it should be of class \pkg{xts} or of lists of class \pkg{xts}
   objects.
 
-  You can use the \pkg{dwd2r} package to download and use the
-  daily station data provided by the German weather service.
+  If you do not have any data yet, use the
+  \code{\link{dwd.download}} function to get some.
 }
 \author{
 Philipp Mueller

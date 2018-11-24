@@ -2,20 +2,20 @@
 % Please edit documentation in R/download.R
 \name{list.files.in.url}
 \alias{list.files.in.url}
-\title{List all files at a certain path of the FTP server.}
+\title{List all files at a certain path on the FTP server}
 \usage{
 list.files.in.url(url)
 }
 \arguments{
-\item{url}{String or character vector pointing to folders at the
-FTP of the DWD.}
+\item{url}{String or character vector pointing to folders on the
+FTP server of the DWD.}
 }
 \value{
-Character vector containing the full URI of the individual
+Character vector containing the full URIs of the individual
   files.
 }
 \description{
-Return a character vector with the full URI of the
+Return a character vector with the full URIs of the
   individual files stored at the provided URLs.
 }
 \author{

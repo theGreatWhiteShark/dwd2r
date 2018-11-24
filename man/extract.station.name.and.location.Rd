@@ -3,26 +3,26 @@
 \name{extract.station.name.and.location}
 \alias{extract.station.name.and.location}
 \title{Extract the names and the position of the individual
-  stations from the description file.}
+  stations from the description file}
 \usage{
 extract.station.name.and.location(station.id, file.description)
 }
 \arguments{
 \item{station.id}{String specifying a station.}
 
-\item{file.description}{Path to a description file matching the
-station IDs and their actual names.}
+\item{file.description}{Path to a description file linking the
+station IDs to their actual names.}
 }
 \value{
 A list containing a string with the name of the station
-  as one element and a numerical vector of length three (
-  longitude, latitude, altitude ) as the second element.
+  as one element and a numerical vector of length three
+  ( longitude, latitude, altitude ) as the second element.
 }
 \description{
 The DWD has a peculiar format for their description
   files. This function will serve as a wrapper to look up the name
   and the location of a station, specified using its
-  \strong{station.id}, inside a description file.
+  \code{station.id}, inside a description file.
 }
 \author{
 Philipp Mueller

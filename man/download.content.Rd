@@ -9,7 +9,7 @@ download.content(url, download.folder = NULL, quiet = FALSE,
 }
 \arguments{
 \item{url}{Either a character vector of one or more URLs to
-folders of the FTP server of the DWD or the output of the
+folders on the FTP server of the DWD or the output of the
 \code{\link{get.dwd.ftp.url}} function.}
 
 \item{download.folder}{Manual override for the default download
@@ -27,32 +27,32 @@ Returns a character vector containing all directories data
   was written to terminated by a '/'.
 }
 \description{
-Downloads the content of the supplied URL. It is
-  intended to work with URLs pointing at folders of the FTP.
+Downloads the content of the supplied URLs. It is
+  intended to work with URLs pointing at folders on the FTP.
 }
 \details{
 The main reason why to use this function over the
-  \emph{wget}, which is used internally for the download, is that
-  it is automatically updates your data.
+  \strong{wget}, which is used internally for the download, is
+  that it is automatically updates your data.
 
   When downloading content for the first time, the function
-  reproduces the directory tree of the FTP server of the DWD and
+  reproduces the directory tree on the FTP server of the DWD and
   puts the specified files in the corresponding
   subfolders. Whenever the function is invoked another time, it
-  compares the content of the folder in the URL with the content
-  of the corresponding local folder. All deleted files will be
-  removed, new files will be downloaded, and 
-  all the others will stay untouched, which saves a lot of time
-  when updating your data base.
+  compares the content of the folders in the URLs with the one of
+  the corresponding local folders. All deleted files will be
+  removed, new files will be downloaded, and all the others will
+  stay untouched, which saves a lot of time when updating your
+  data base.
 
   The folder, which will contain all the source files downloaded
-  from the FTP server of the DWD will be set via \code{option(
+  from the FTP server of the DWD, will be set via \code{option(
   "dwd2r.download.path" )}. Per default it is set to the
   \emph{R/dwd_data} folder in your home. If you wish to change
   this default path, you have to override this option in your
-  \emph{.Rprofile} configuration file in your home. In addition,
+  \strong{.Rprofile} configuration file in your home. In addition,
   the download folder can be supplied manually using the
-  \strong{download.folder} argument.
+  \code{download.folder} argument.
 }
 \author{
 Philipp Mueller

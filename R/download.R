@@ -1,16 +1,16 @@
 ### data-download.R - a set of function to download the content of the
 ##    FTP server of the DWD
-##' @title List all files at a certain path of the FTP server.
-##' @description Return a character vector with the full URI of the
+##' @title List all files at a certain path on the FTP server
+##' @description Return a character vector with the full URIs of the
 ##'   individual files stored at the provided URLs.
 ##'
-##' @param url String or character vector pointing to folders at the
-##'   FTP of the DWD.
+##' @param url String or character vector pointing to folders on the
+##'   FTP server of the DWD.
 ##'
 ##' @importFrom RCurl getURL
 ##' @importFrom RCurl url.exists
 ##'
-##' @return Character vector containing the full URI of the individual
+##' @return Character vector containing the full URIs of the individual
 ##'   files.
 ##' @author Philipp Mueller
 list.files.in.url <- function( url ){
@@ -63,33 +63,33 @@ list.files.in.url <- function( url ){
 }
 
 ##' @title Download files from the FTP server of the DWD
-##' @description Downloads the content of the supplied URL. It is
-##'   intended to work with URLs pointing at folders of the FTP.
+##' @description Downloads the content of the supplied URLs. It is
+##'   intended to work with URLs pointing at folders on the FTP.
 ##' @details The main reason why to use this function over the
-##'   \emph{wget}, which is used internally for the download, is that
-##'   it is automatically updates your data.
+##'   \strong{wget}, which is used internally for the download, is
+##'   that it is automatically updates your data.
 ##'
 ##'   When downloading content for the first time, the function
-##'   reproduces the directory tree of the FTP server of the DWD and
+##'   reproduces the directory tree on the FTP server of the DWD and
 ##'   puts the specified files in the corresponding
 ##'   subfolders. Whenever the function is invoked another time, it
-##'   compares the content of the folder in the URL with the content
-##'   of the corresponding local folder. All deleted files will be
-##'   removed, new files will be downloaded, and 
-##'   all the others will stay untouched, which saves a lot of time
-##'   when updating your data base.
+##'   compares the content of the folders in the URLs with the one of
+##'   the corresponding local folders. All deleted files will be
+##'   removed, new files will be downloaded, and all the others will
+##'   stay untouched, which saves a lot of time when updating your
+##'   data base.
 ##' 
 ##'   The folder, which will contain all the source files downloaded
-##'   from the FTP server of the DWD will be set via \code{option(
+##'   from the FTP server of the DWD, will be set via \code{option(
 ##'   "dwd2r.download.path" )}. Per default it is set to the
 ##'   \emph{R/dwd_data} folder in your home. If you wish to change
 ##'   this default path, you have to override this option in your
-##'   \emph{.Rprofile} configuration file in your home. In addition,
+##'   \strong{.Rprofile} configuration file in your home. In addition,
 ##'   the download folder can be supplied manually using the
-##'   \strong{download.folder} argument.
+##'   \code{download.folder} argument.
 ##'
 ##' @param url Either a character vector of one or more URLs to
-##'   folders of the FTP server of the DWD or the output of the
+##'   folders on the FTP server of the DWD or the output of the
 ##'   \code{\link{get.dwd.ftp.url}} function.
 ##' @param download.folder Manual override for the default download
 ##'   folder of the package. If NULL, the default value will be used
@@ -98,8 +98,6 @@ list.files.in.url <- function( url ){
 ##'   procedure. Default = FALSE.
 ##' @param debug If TRUE is enables verbose messages of the individual
 ##'   downloads. Default = FALSE.
-##'
-##' @export
 ##'
 ##' @return Returns a character vector containing all directories data
 ##'   was written to terminated by a '/'.
@@ -242,53 +240,84 @@ download.content <- function( url, download.folder = NULL,
   return( subfolders )
 }
 ##' @title Downloads data of the DWD
-##' @description Downloads daily weather data from observation
-##'   stations in Germany and extracts minimum and maximum temperature
-##'   as well as precipitation data.
+##' 
+##' @description It will guide the user through the hierarchical
+##'   structure of the DWD's FTP server and let her choose some
+##'   data. Then, the data will the downloaded, extracted locally, and
+##'   converted into a format usable within R. This data, along with
+##'   some meta-data obtained during the download as well, will be
+##'   stored on the hard disk so the user load it later on using the
+##'   \code{\link{source.data}} function.
 ##'
-##' @details The download will be done using 'wget'. Per default the
-##'   dwd2r.download.path variable from the \code{getOption(
-##'   "dwd2r.download.path" )} will be used to set the download
-##'   path. Since this function will check the files already present
-##'   it's strongly recommended to use the save.downloads
-##'   options. Whenever this function is invoked again only updated
-##'   files will be downloaded which saves a lot of traffic and
-##'   time. The csv.export option can be used to export the time
-##'   series into a data type file making it available outside of R
-##'   too. In addition, the geographic positions of the individual
-##'   stations will be extracted and saved as well. They are needed
-##'   for the leaflet module of the climex shiny app. CAUTION: since
-##'   this procedure takes a while its run in parallel on all cores of
-##'   your machine!
-##' @param save.downloads If TRUE the downloaded .zip files are stored
-##'   in download.folder/downloads_dwd. Else they will be deleted
-##'   after the extracting. Default = TRUE.
-##' @param url If the user wants to avoid the guided selection.
-##' @param csv.export If TRUE creates an additional folder containing
-##'   .csv files with the individual station data. Using this the data
-##'   can be used outside of R too. Default = FALSE.
-##' @param download.folder Specifies the data will be stored and
-##'   downloaded too. It is advised to store it in the path stored in
-##'   the \code{options( "dwd2r.download.path" )}, which is also used
-##'   for importing the saved data. You can overwrite its default
-##'   value of "~/R/dwd_data/" by adding \code{options(
-##'   dwd2r.download.path = "PATH" )} to your .Rprofile path in your
-##'   home.
+##' @details Since there is A LOT of different data provided by
+##'   the German weather service (DWD), it makes no sense to specify
+##'   them all using input arguments to this function. Instead, the
+##'   user will be guided interactively through the different data
+##'   sources and specifies the data she want using the inputs at the
+##'   prompt. If you prefer to run the function non-interactive, you
+##'   can use the \code{batch.choices} argument and supply a vector of
+##'   numbers corresponding to your choices. See the
+##'   \code{\link{get.dwd.ftp.url}} function for details.
+##'
+##'   When downloading content for the first time, the function
+##'   reproduces the directory tree on the FTP server of the DWD and
+##'   puts the specified files in the corresponding
+##'   subfolders. Whenever the function is invoked another time, it
+##'   compares the content of the folders in the URLs with the one of
+##'   the corresponding local folders. All deleted files will be
+##'   removed, new files will be downloaded, and all the others will
+##'   stay untouched, which saves a lot of time when updating your
+##'   data base. See \code{\link{download.content}} for details.
+##' 
+##'   Depending on the data format present in the downloaded files,
+##'   more than one file will be stored on the hard disk of the
+##'   user. In case of aggregated data, a separate file per column
+##'   (climatological quantity) will be saved using the name of the
+##'   quantity as filename. In all those files in \strong{.RData}
+##'   format, two objects will be contained: A named list (using the
+##'   station names) of all the station data in the format specified
+##'   by \code{time.series.format} and an object containing additional
+##'   meta-information for all stations (their longitude, latitude,
+##'   and altitude) in a format specified by
+##'   \code{use.geospatial.position.format}. See
+##'   \code{\link{conversion.climate}} for details.
+##' 
+##' @param save.downloads If TRUE, the downloaded \emph{.zip} files
+##'   are stored in \code{download.folder}\emph{/downloads_dwd}. Else,
+##'   they will be deleted after the extraction. Default = TRUE.
+##' @param url A character vector containing one or more URLs pointing
+##'   to the different data folders on the FTP server of the DWD. If
+##'   this input argument is present, the interactive selection of the
+##'   data set will be skip.
+##' @param csv.export If TRUE, the function creates an additional
+##'   folder containing .csv files with the individual station
+##'   data. Using them, the data can be accessed outside of R
+##'   too. Default = FALSE.
+##' @param download.folder Specifies where the data will be stored and
+##'   downloaded to. If you wish to alter the default settings and
+##'   provide a string using this input argument instead, it is
+##'   advised to store it in the \code{options( "dwd2r.download.path"
+##'   )} too, because it will also be used to import the saved
+##'   data. You can overwrite its default value of
+##'   \emph{"~/R/dwd_data/"} by adding \code{options(
+##'   dwd2r.download.path = "PATH" )} to the \emph{.Rprofile}
+##'   configuration file in your home.
 ##' @param batch.choices Numerical vector containing the numbers,
-##'   which corresponds to the choices in the interactive mode. If
-##'   NULL, the choices will be done interactively. Default = NULL.
+##'   which correspond to the choices in the interactive mode. If
+##'   NULL, the choices will be selected interactively. Default =
+##'   NULL.
 ##' @param time.series.format Format of the extracted time
-##'   series. They can either be of type \strong{data.frame} and contain two
-##'   columns, "date" and "value", or a time series provided by the
-##'   \pkg{xts} package. Default = "xts".
+##'   series. They can either be of type \strong{data.frame} and
+##'   contain two columns, "date" and "value", or a time series
+##'   provided by the \pkg{xts} package. Default = "xts".
 ##' @param use.geospatial.position.format If FALSE, the object
 ##'   containing the geospatial information of all stations will be of
-##'   type data.frame and consists of the columns named
+##'   type \strong{data.frame} and consist of the columns named
 ##'   \emph{longitude}, \emph{latitude}, \emph{altitude}, and
-##'   \emph{name}. If TRUE, an object of class SpatialPointsDataFrame
-##'   will be used instead and \emph{altitude} and \emph{name}
-##'   information can be accessed via the \code{@data}
-##'   attribute. Default = TRUE.
+##'   \emph{name}. If TRUE, an object of class
+##'   \code{\link[sp]{SpatialPointsDataFrame}} will be used instead
+##'   and the \emph{altitude} and \emph{name} information can be
+##'   accessed via the \code{@data} attribute. Default = TRUE.
 ##' @param quiet Whether or not to display the output generated when
 ##'   downloading the content. Default = FALSE.
 ##' @param debug If TRUE is enables verbose messages of the individual
@@ -307,7 +336,7 @@ download.content <- function( url, download.folder = NULL,
 ##'               batch.choices  = c( 1, 1, 5, 1 ),
 ##'               time.series.format = "xts" )
 ##' 
-##' @return invisible( TRUE )
+##' @return \code{invisible( TRUE )}
 ##' 
 ##' @author Philipp Mueller 
 dwd.download <- function( save.downloads = TRUE, csv.export = FALSE,

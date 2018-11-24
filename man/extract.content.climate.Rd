@@ -2,8 +2,8 @@
 % Please edit documentation in R/import.R
 \name{extract.content.climate}
 \alias{extract.content.climate}
-\title{Unzips files and extracts the content of DWD source files
-  for a single station.}
+\title{Unzips and extracts the content of DWD source files
+  for a single station}
 \usage{
 extract.content.climate(station.id, files.list, download.folder.recent,
   download.folder.historical, time.series.format = c("xts",
@@ -29,9 +29,9 @@ columns, "date" and "value", or a time series provided by the
 \pkg{xts} package. Default = "xts".}
 }
 \value{
-- Named list of either \pkg{xts}-class or data.frame objects
-  where each element of the list corresponds to one data column in
-  the data files.
+- Named list of either \pkg{xts}-class or \strong{data.frame}
+  objects where each element of the list corresponds to one
+  column in the data files.
  - NULL if no data at all could be extracted for the station.
 }
 \description{
@@ -40,19 +40,19 @@ Reads in the content of both the recent and
   its data, and converts it into a format R can handle.
 }
 \details{
-The station is specified by its \emph{station.id}. The
+The station is specified by its \code{station.id}. The
   extraction will take place in either
-  \strong{download.folder.recent} or
-  \strong{download.folder.historical}. Before extraction all its
+  \code{download.folder.recent} or
+  \code{download.folder.historical}. Before extraction all its
   content will be removed.
 }
 \examples{
-  ## The \\pkg{dwd2r} provides some mock data its internal
-  ## functions can be tested and developed with without downloading
-  ## any content from the DWD server. From the package's root
+## The \\pkg{dwd2r} provides some mock data so its internal
+  ## functions can be tested and developed without downloading
+  ## any content from the DWD server. At the package's root
   ## directory call this function in the following way (be sure to
-  ## create the two folders \\emph{download.folder.recent} and
-  ## \\emph{download.folder.historical} beforehand.
+  ## create the two folders \\code{download.folder.recent} and
+  ## \\code{download.folder.historical} beforehand).
   dwd2r:::extract.content.climate( "03987",
     list( historical = "./res/produkt_03987_historical_mock.zip",
           recent = "./res/produkt_03987_recent_mock.zip" ),

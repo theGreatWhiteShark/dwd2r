@@ -8,8 +8,6 @@
 ##'   interactively, please see the \code{\link{get.dwd.ftp.url}}
 ##'   function.
 ##'
-##' @export
-##'
 ##' @return A list containing all URLs of the DWD FTP server grouped
 ##'   by their type of measurement. It contains six elements
 ##'   \itemize{

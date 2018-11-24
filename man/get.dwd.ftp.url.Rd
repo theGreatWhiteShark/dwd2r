@@ -8,18 +8,20 @@ get.dwd.ftp.url(batch.choices = NULL)
 }
 \arguments{
 \item{batch.choices}{Numerical vector containing the numbers,
-which corresponds to the choices in the interactive mode. If
-NULL, the choices will be done interactively. Default = NULL.}
+which correspond to the choices in the interactive mode. If
+NULL, the choices will be selected interactively. Default =
+NULL.}
 }
 \value{
 List containing to two elements
   \itemize{
-    \item{ \emph{data} - a character vector containing one or more
-             URLs pointing to the different data folders. }
-    \item{ \emph{meta} - character vector pointing to the folder
+    \item{\code{data} - A character vector containing one or more
+             URLs pointing to the different data folders on the
+             FTP servers of the DWD}
+    \item{\code{meta} - A character vector pointing to the folder
              containing the meta data. Or NULL if there is no
-             distinct folder and the meta data are contained in
-             the folders present in the \emph{data} URLs } 
+             distinct folder and the meta data is contained in
+             the folders present in the \code{data} URLs} 
   }
 }
 \description{
@@ -28,12 +30,12 @@ Interactive function to extract the download URLs of the
 }
 \details{
 Since there is A LOT of different data provided by
-  the German weather service (DWD), it makes not sense to specify
+  the German weather service (DWD), it makes no sense to specify
   them all using input arguments to this function. Instead, the
   user will be guided interactively through the different data
   sources and specifies the data she want using the inputs at the
   prompt. If you prefer to run the function non-interactive, you
-  can use the \emph{batch.choices} argument and supply a vector of
+  can use the \code{batch.choices} argument and supply a vector of
   numbers corresponding to your choices.
 
   As another option, you can use the \code{\link{cat.dwd.ftp.url}}
