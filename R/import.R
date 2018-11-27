@@ -369,8 +369,8 @@ conversion.climate <- function( files.list, files.description.list,
 ##'   ## create the two folders \code{download.folder.recent} and
 ##'   ## \code{download.folder.historical} beforehand).
 ##'   dwd2r:::extract.content.climate( "03987",
-##'     list( historical = "./res/produkt_03987_historical_mock.zip",
-##'           recent = "./res/produkt_03987_recent_mock.zip" ),
+##'     list( historical = "./res/produkt_03987_potsdam_historical_mock.zip",
+##'           recent = "./res/produkt_potsdam_recent_03987_mock.zip" ),
 ##'           download.folder.recent, download.folder.historical, "xts" )
 ##' 
 ##' @return

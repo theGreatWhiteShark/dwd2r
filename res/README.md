@@ -6,8 +6,8 @@ for a development of the package without any access to the internet.
 # Mock data
 
 The mock data include authentic archives containing both the
-[recent](res/produkt_03987_recent_mock.zip) and the
-[historical](res/produkt_03987_historical_mock.zip) data of the
+[recent](res/produkt_potsdam_recent_03987_mock.zip) and the
+[historical](res/produkt_03987_potsdam_historical_mock.zip) data of the
 Potsdam weather station in as aggregated and daily observations. In
 addition, the [description
 file](res/KL_Tageswerte_Beschreibung_mock.txt) containing the
