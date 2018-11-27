@@ -40,9 +40,12 @@
 ##'   folder containing .csv files with the individual station
 ##'   data. Using them, the data can be accessed outside of R
 ##'   too. Default = FALSE.
-##' @param download.folder This folder will be used to unpack and
-##'   extract the \emph{.zip} archives in. It does not have to be the
-##'   same as the one containing the downloaded content.
+##' @param download.folder In this folder two subfolders
+##'   \emph{tmpRecent} and \emph{tmpHistorical} will be created and
+##'   used to unpack and extract the \emph{.zip} archives provided via
+##'   \code{files.list} in. It does not have to be the same as the one
+##'   containing the downloaded content. Both temporary subfolders
+##'   will be removed later on.
 ##' @param prefix.file.name String, which will be prepended to all
 ##'   saved files.
 ##' @param time.series.format Format of the extracted time
@@ -95,6 +98,12 @@ conversion.climate <- function( files.list, files.description.list,
     ## If there isn't already a / char present at the end of the
     ## prefix, add one.
     prefix.file.name <- gsub( '/', '', prefix.file.name )
+  }
+  ## Ensure the download.folder end with a '/'
+  if ( substring( download.folder,
+                 length( charToRaw( download.folder) ),
+                 length( charToRaw( download.folder) ) ) != "/" ){
+    download.folder <- paste0( download.folder, "/" )
   }
   ## Reading the content of the file containing the
   ## description of the station data.
@@ -238,11 +247,23 @@ conversion.climate <- function( files.list, files.description.list,
   station.positions <-
     Reduce( rbind, lapply( quantities.info, function( ss )
       ss$location ) )
-  station.positions <- data.frame(
-      longitude = station.positions[ , 1 ],
-      latitude = station.positions[ , 2 ],
-      altitude = station.positions[ , 3 ],
-      name = station.names )
+  if ( class( station.positions ) == "numeric" ){
+    ## If there is just one station present, `rbind` does produce a
+    ## numerical vector and NOT a data.frame.
+    station.positions <- data.frame(
+        longitude = station.positions[ 1 ],
+        latitude = station.positions[ 2 ],
+        altitude = station.positions[ 3 ],
+        name = station.names )
+  } else if ( class( station.positions ) == "data.frame" ){
+    station.positions <- data.frame(
+        longitude = station.positions[ , 1 ],
+        latitude = station.positions[ , 2 ],
+        altitude = station.positions[ , 3 ],
+        name = station.names )
+  } else {
+    stop( "Unknown class of the station.positions object" )
+  }
   
   ## Ordering the stations according to their names in alphabetical
   ## order.
@@ -298,7 +319,7 @@ conversion.climate <- function( files.list, files.description.list,
                      sep = ",", row.names = FALSE )
         }
       } else if ( time.series.format == "data.frame" ){
-        for ( ss in 1 : length( tmp ) )
+        for ( ss in 1 : length( tmp ) ){
           utils::write.table( tmp[[ ss ]],
                      file = paste0( download.folder, 'csv/',
                                    prefix.file.name, '/', qq, '/',
@@ -306,6 +327,7 @@ conversion.climate <- function( files.list, files.description.list,
                                         names( tmp )[ ss ],
                                         fixed = TRUE ), ".csv" ),
                      sep = ",", row.names = FALSE )
+        }
       } else {
         stop( "Unknown time series format!" )
       }
@@ -323,8 +345,7 @@ conversion.climate <- function( files.list, files.description.list,
                   length( stations.content[[ 1 ]] ), "..." ) )
     }
     qq <- names( stations.content[[ 1 ]] )[ qq.idx ]
-    tmp <- get( paste0( "dwd.", qq ) )
-    save( tmp, station.positions,
+    save( list = paste0( "dwd.", qq ), station.positions,
          file = paste0( download.folder, "dwd_",
                        prefix.file.name, '_',
                        gsub( ".", "-", paste( qq, 
@@ -548,7 +569,8 @@ extract.content.climate <- function( station.id, files.list,
                        content.list[[ ll ]][[ rr ]][
                            !content.list[[ ll ]][[ rr ]]$date %in%
                            result.list[[ rr ]]$date,  ] )
-          
+          ## Temporal ordering of the data.
+          res <- res[ order( res$date ), ]
           return( res ) } )
       }
     } else {

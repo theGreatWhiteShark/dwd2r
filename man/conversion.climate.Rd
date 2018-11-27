@@ -23,9 +23,12 @@ folder containing .csv files with the individual station
 data. Using them, the data can be accessed outside of R
 too. Default = FALSE.}
 
-\item{download.folder}{This folder will be used to unpack and
-extract the \emph{.zip} archives in. It does not have to be the
-same as the one containing the downloaded content.}
+\item{download.folder}{In this folder two subfolders
+\emph{tmpRecent} and \emph{tmpHistorical} will be created and
+used to unpack and extract the \emph{.zip} archives provided via
+\code{files.list} in. It does not have to be the same as the one
+containing the downloaded content. Both temporary subfolders
+will be removed later on.}
 
 \item{prefix.file.name}{String, which will be prepended to all
 saved files.}
