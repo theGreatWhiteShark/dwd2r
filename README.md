@@ -109,5 +109,5 @@ A copy of the GNU General Public License, version 3, is available at
 ### License (remote data)
 
 The terms of usage of the data provided by the German weather service
-are included in [German](res/Nutzungsbedingungen_German.txt) and in
-[English](res/Terms_of_use.txt).
+are included in [German](inst/res/Nutzungsbedingungen_German.txt) and in
+[English](inst/res/Terms_of_use.txt).

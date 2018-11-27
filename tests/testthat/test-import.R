@@ -3,18 +3,22 @@ context("Testing the import and conversion capabilities of the package" )
 
 ## Since some files will be stored on disk and cleaned up afterwards,
 ## we want to perform the following actions in a clean environment.
-dir.name <- "./conversion-folder-funny-name-nobody-would-choose"
+dir.name <- "conversion-folder-funny-name-nobody-would-choose"
 dir.create( dir.name )
 test_that( "conversion.climate writes out the converted data", {
   expect_true(
       dwd2r:::conversion.climate(
           files.list =
-            list( recent = "../../res/produkt_potsdam_recent_03987_mock.zip",
-                 historical =
-                   "../../res/produkt_03987_potsdam_historical_mock.zip" ),
+            list( recent = file.path(
+                      system.file( "inst", package = "dwd2r" ), "res",
+                      "produkt_potsdam_recent_03987_mock.zip" ),
+                 historical = file.path(
+                      system.file( "inst", package = "dwd2r" ), "res",
+                   "produkt_03987_potsdam_historical_mock.zip" ) ),
           files.description.list =
-            list( recent =
-                    "../../res/KL_Tageswerte_Beschreibung_mock.txt" ),
+            list( recent = file.path(
+                      system.file( "inst", package = "dwd2r" ), "res",
+                    "KL_Tageswerte_Beschreibung_mock.txt" ) ),
           download.folder = dir.name,
           csv.export = TRUE, quiet = TRUE,
           prefix.file.name = "xts",
@@ -23,12 +27,16 @@ test_that( "conversion.climate writes out the converted data", {
   expect_true(
       dwd2r:::conversion.climate(
           files.list =
-            list( recent = "../../res/produkt_potsdam_recent_03987_mock.zip",
-                 historical =
-                   "../../res/produkt_03987_potsdam_historical_mock.zip" ),
+            list( recent = file.path(
+                      system.file( "inst", package = "dwd2r" ), "res",
+                      "produkt_potsdam_recent_03987_mock.zip" ),
+                 historical =file.path(
+                      system.file( "inst", package = "dwd2r" ), "res",
+                     "produkt_03987_potsdam_historical_mock.zip" ) ),
           files.description.list =
-            list( recent =
-                    "../../res/KL_Tageswerte_Beschreibung_mock.txt" ),
+            list( recent = file.path(
+                      system.file( "inst", package = "dwd2r" ), "res",
+                    "KL_Tageswerte_Beschreibung_mock.txt" ) ),
           download.folder = dir.name,
           csv.export = TRUE, quiet = TRUE,
           prefix.file.name = "df",
@@ -67,10 +75,10 @@ test_that( "conversion.climate writes out the converted data", {
                  "dwd_xts_wind-gust-max.RData",
                  "dwd_xts_wind-gust-mean.RData",
                  "dwd_xts_wind-gust-quality.RData" ) )
-  expect_equal( list.files( paste0( dir.name, '/csv/' ) ),
+  expect_equal( list.files( file.path( dir.name, 'csv' ) ),
                c( "df", "xts" ) )
   expect_equal(
-      list.files( paste0( dir.name, '/csv/xts/' ) ),
+      list.files( file.path( dir.name, 'csv', 'xts' ) ),
       c( "cloud.cover.mean", "precipitation.form",
         "precipitation.height", "pressure.mean", "quality.general",
         "relative.humidity.mean", "snow.depth", "sunshine.duration",
@@ -79,7 +87,7 @@ test_that( "conversion.climate writes out the converted data", {
         "vapour.pressure.mean", "wind.gust.max", "wind.gust.mean",
         "wind.gust.quality" ) )
   expect_equal(
-      list.files( paste0( dir.name, '/csv/df/' ) ),
+      list.files( file.path( dir.name, 'csv', 'df' ) ),
       c( "cloud.cover.mean", "precipitation.form",
         "precipitation.height", "pressure.mean", "quality.general",
         "relative.humidity.mean", "snow.depth", "sunshine.duration",
@@ -89,17 +97,19 @@ test_that( "conversion.climate writes out the converted data", {
         "wind.gust.quality" ) )
   ## Check whether all these subfolders do contain actual .csv files.
   expect_equal(
-      Reduce( sum, lapply( list.files( paste0( dir.name, '/csv/xts/' ),
-                                      full.names = TRUE ),
+      Reduce( sum, lapply( list.files(
+                       file.path( dir.name, 'csv', 'xts' ),
+                       full.names = TRUE ),
                           function( pp )
                             grep( "Potsdam.csv", list.files( pp ) ))),
-      length( list.files( paste0( dir.name, '/csv/xts/' ) ) ) )
+      length( list.files( file.path( dir.name, 'csv', 'xts' ) ) ) )
   expect_equal(
-      Reduce( sum, lapply( list.files( paste0( dir.name, '/csv/df/' ),
-                                      full.names = TRUE ),
+      Reduce( sum, lapply( list.files(
+                       file.path( dir.name, 'csv', 'df' ),
+                       full.names = TRUE ),
                           function( pp )
                             grep( "Potsdam.csv", list.files( pp ) ))),
-      length( list.files( paste0( dir.name, '/csv/df/' ) ) ) )
+      length( list.files( file.path( dir.name, 'csv', 'df' ) ) ) )
 })
 
 ## All loaded files will be attached to a clean environment to prevent
@@ -107,7 +117,7 @@ test_that( "conversion.climate writes out the converted data", {
 test.environment <- new.env( parent = .GlobalEnv )
 test_that( "the xts .RData written by conversion.climate is of the right format", {
   expect_equal( {
-    load( paste0( dir.name, "/dwd_xts_temperature-2m-max.RData" ),
+    load( file.path( dir.name, "dwd_xts_temperature-2m-max.RData" ),
          envir = test.environment )
     ls( envir = test.environment ) },
     c( "dwd.temperature.2m.max", "station.positions" ) )
@@ -140,7 +150,7 @@ test_that( "the xts .RData written by conversion.climate is of the right format"
 test.environment <- new.env( parent = .GlobalEnv )
 test_that( "the data.frame .RData written by conversion.climate is of the right format", {
   expect_equal( {
-    load( paste0( dir.name, "/dwd_df_temperature-2m-max.RData" ),
+    load( file.path( dir.name, "dwd_df_temperature-2m-max.RData" ),
          envir = test.environment )
     ls( envir = test.environment ) },
     c( "dwd.temperature.2m.max", "station.positions" ) )
@@ -169,14 +179,14 @@ test_that( "the data.frame .RData written by conversion.climate is of the right 
 test_that( "the .csv written by conversion.climate is of the right format", {
   expect_equal( {
     data.xts <- read.csv2(
-        paste0( dir.name, "/csv/xts/temperature.2m.max/Potsdam.csv" ),
-               header = TRUE, sep=',' )
+        file.path( dir.name, "csv", "xts", "temperature.2m.max",
+                  "Potsdam.csv" ), header = TRUE, sep=',' )
     class( data.xts ) }, "data.frame" )
   expect_equal( dim( data.xts ), c( 45977, 2 ) )
   expect_equal( {
     data.df <- read.csv2(
-        paste0( dir.name, "/csv/df/temperature.2m.max/Potsdam.csv" ),
-               header = TRUE, sep=',' )
+        file.path( dir.name, "csv", "df", "temperature.2m.max",
+                  "Potsdam.csv" ), header = TRUE, sep=',' )
     class( data.df ) }, "data.frame" )
   expect_equal( dim( data.df ), c( 45977, 2 ) )
   expect_true( all( data.xts == data.df ) )
