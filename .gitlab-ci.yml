@@ -1,0 +1,7 @@
+image: thegreatwhiteshark/climex-r-ubuntu:1.1.2
+
+test:
+  script:
+    ## Get the newest version of all dependencies
+    - R -q -e 'devtools::install()'
+    - R -q -e 'devtools::test()'
