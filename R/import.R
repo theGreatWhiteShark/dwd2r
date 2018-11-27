@@ -386,13 +386,15 @@ conversion.climate <- function( files.list, files.description.list,
 ##' @examples ## The \pkg{dwd2r} provides some mock data so its internal
 ##'   ## functions can be tested and developed without downloading
 ##'   ## any content from the DWD server. At the package's root
-##'   ## directory call this function in the following way (be sure to
-##'   ## create the two folders \code{download.folder.recent} and
-##'   ## \code{download.folder.historical} beforehand).
+##'   ## directory call this function in the following way.
 ##'   dwd2r:::extract.content.climate( "03987",
-##'     list( historical = "./res/produkt_03987_potsdam_historical_mock.zip",
-##'           recent = "./res/produkt_potsdam_recent_03987_mock.zip" ),
-##'           download.folder.recent, download.folder.historical, "xts" )
+##'     list( historical = file.path(
+##'             system.file( "inst", package = "dwd2r" ), "res",
+##'             "produkt_03987_potsdam_historical_mock.zip" ),
+##'           recent = file.path(
+##'             system.file( "inst", package = "dwd2r" ), "res",
+##'             "produkt_potsdam_recent_03987_mock.zip" ) ),
+##'           "tmpRecent", "tmpHistorical", "xts" )
 ##' 
 ##' @return
 ##'  - Named list of either \pkg{xts}-class or \strong{data.frame}

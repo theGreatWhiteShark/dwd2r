@@ -326,15 +326,6 @@ download.content <- function( url, download.folder = NULL,
 ##' 
 ##' @export
 ##'
-##' @usage
-##' ## Downloading the aggregated collection of the daily measured
-##' ## climatic data of the DWD into a local folder, create .csv files
-##' ## from all the time series, and store the files (to be able to do
-##' ## a diff at a latter point in time).
-##' dwd.download( save.downloads = TRUE, csv.export = TRUE,
-##'               download.folder = "./local/folder",
-##'               batch.choices  = c( 1, 1, 5, 1 ),
-##'               time.series.format = "xts" )
 ##' 
 ##' @return \code{invisible( TRUE )}
 ##' 

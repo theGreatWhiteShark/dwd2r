@@ -4,14 +4,11 @@
 \alias{dwd.download}
 \title{Downloads data of the DWD}
 \usage{
-## Downloading the aggregated collection of the daily measured
-## climatic data of the DWD into a local folder, create .csv files
-## from all the time series, and store the files (to be able to do
-## a diff at a latter point in time).
-dwd.download( save.downloads = TRUE, csv.export = TRUE,
-              download.folder = "./local/folder",
-              batch.choices  = c( 1, 1, 5, 1 ),
-              time.series.format = "xts" )
+dwd.download(save.downloads = TRUE, csv.export = FALSE, url = NULL,
+  download.folder = NULL, batch.choices = NULL,
+  time.series.format = c("xts", "data.frame"),
+  use.geospatial.position.format = TRUE, quiet = FALSE,
+  debug = FALSE)
 }
 \arguments{
 \item{save.downloads}{If TRUE, the downloaded \emph{.zip} files
