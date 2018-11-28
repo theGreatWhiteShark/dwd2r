@@ -90,6 +90,9 @@ options( dwd2r.download.path = "PATH" )
 
 All downloads will now be stored in the _PATH_ directory.
 
+For a more thorough introduction into the **dwd2r** package please see
+its [vignette](vignettes/dwd2r.md).
+
 ---
 
 ### License (source code & package)

@@ -1,4 +1,4 @@
-\### url-retrieval.R - All functions concerned with the
+### url-retrieval.R - All functions concerned with the
 ### interaction with FTP server of the DWD
 
 ##' @title Obtain URLs to the FTP server
