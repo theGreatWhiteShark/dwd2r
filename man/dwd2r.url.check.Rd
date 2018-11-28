@@ -26,8 +26,13 @@ This helper function tests whether URLs are reachable
 The check will be performed \code{number.of.tries} per
   URL. The FTP server of the DWD is quite prone to identify the
   \code{\link[RCurl]{url.exists}} function as an DDOS attempt.
-  Therefore, one often was to redo the check after some
-  milliseconds (10ms) of waiting.
+  Therefore, the function will wait some random time before
+  attempting to check the URL. The waiting time will be normal
+  distributed with a mean of 150ms and a standard deviation of
+  50ms and the distribution is cut-off at 1ms to be the lowest
+  possible value (of course we do not want to have negative
+  waiting times and the Gaussian distribution has infinite
+  support).
 }
 \author{
 Philipp Mueller

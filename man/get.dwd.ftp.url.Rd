@@ -54,7 +54,7 @@ Since there is A LOT of different data provided by
 \examples{
 ## Get the URLs pointing to the aggregated collection of the daily
 ## measured climatic data of the DWD.
-dwd2r:::get.dwd.ftp.url( batch.choices  = c( 1, 1, 5, 1 ) )
+get.dwd.ftp.url( batch.choices  = c( 1, 1, 5, 1 ) )
 
 }
 \seealso{

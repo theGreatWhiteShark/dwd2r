@@ -84,7 +84,11 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
            "First batch choice out of range" )
   
   ## Sanity check
-  dwd2r.url.check( paste0( url.root, url.top.level ) )
+  ## Only perform the sanity check for the batch choices once and
+  ## directly before returning the URL.
+  if ( is.null( batch.choices ) ){
+    dwd2r.url.check( paste0( url.root, url.top.level ) )
+  }
   
   if ( selection.top.level == "1" ){
     ##
@@ -110,9 +114,11 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
              "Second batch choice out of range" )
     
     ## Sanity check
-    dwd2r.url.check( paste0( url.root, url.top.level,
-                            url.second.level ) )
-
+    if ( is.null( batch.choices ) ){
+      dwd2r.url.check( paste0( url.root, url.top.level,
+                              url.second.level ) )
+    }
+    
     if ( selection.second.level == "1" ){
       ##
       ## Observation data from Germany - climate
@@ -141,10 +147,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "Third batch choice out of range" )
       
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level ) )
-
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level ) )
+      }
+      
       if ( selection.third.level == "1" ){
         ##
         ## Observation data from Germany - climate -
@@ -411,9 +419,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "Third batch choice out of range" )
 
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level ) )
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level ) )
+      }
+      
       if ( selection.third.level == "1" ){
         ##
         ## Observation data from Germany - phenology -
@@ -541,8 +552,11 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                "Second batch choice out of range" )
 
     ## Sanity check
-    dwd2r.url.check( paste0( url.root, url.top.level,
-                            url.second.level ) )
+    if ( is.null( batch.choices ) ){
+      dwd2r.url.check( paste0( url.root, url.top.level,
+                              url.second.level ) )
+    }
+    
     if ( selection.second.level == "1" ){
       ##
       ## Observation data from around the globe - monthly
@@ -561,9 +575,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "2" = "raw/",
                                 "Third batch choice out of range" )
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level ) )
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level ) )
+      }
+      
       if ( selection.third.level == "1" ){
         ##
         ## Observation data from around the globe - monthly
@@ -685,9 +702,11 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                "Second batch choice out of range" )
     
     ## Sanity check
-    dwd2r.url.check( paste0( url.root, url.top.level,
-                            url.second.level ) )
-
+    if ( is.null( batch.choices ) ){
+      dwd2r.url.check( paste0( url.root, url.top.level,
+                              url.second.level ) )
+    }
+      
     if ( selection.second.level == "1" ){
       ##
       ## Grid data throughout Germany - hourly
@@ -706,9 +725,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "Third batch choice out of range" )
       
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level) )
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level) )
+      }
+      
       if ( selection.third.level == "1" ){
         ##
         ## Grid data throughout Germany - hourly
@@ -810,9 +832,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "Third batch choice out of range" )
       
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level) )
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level) )
+      }
+      
       if ( selection.third.level == "1" ){
         ##
         ## Grid data throughout Germany - daily
@@ -935,9 +960,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "Third batch choice out of range" )
       
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level) )
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level) )
+      }
+      
       if ( selection.third.level == "1" ){
         ##
         ## Grid data throughout Germany - monthly
@@ -1136,9 +1164,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "Third batch choice out of range" )
       
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level ) )
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level ) )
+      }
+      
       if ( selection.third.level == "1" ){
         warning( paste(
             "The import the annual phenology is not supported yet. It consists of data for numerous fruits and stuff. If you wish to use this data, check out the FTP server",
@@ -1221,9 +1252,12 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                 "Third batch choice out of range" )
       
       ## Sanity check
-      dwd2r.url.check( paste0( url.root, url.top.level,
-                              url.second.level,
-                              url.third.level ) )
+      if ( is.null( batch.choices ) ){
+        dwd2r.url.check( paste0( url.root, url.top.level,
+                                url.second.level,
+                                url.third.level ) )
+      }
+      
       if ( selection.third.level %in% c( "11", "12", "16" ) ){
         ##
         ## Grid data throughout Germany - multi annual
@@ -1311,8 +1345,11 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                "Second batch choice out of range" )
     
     ## Sanity check
-    dwd2r.url.check( paste0( url.root, url.top.level,
-                            url.second.level ) )
+    if ( is.null( batch.choices ) ){
+      dwd2r.url.check( paste0( url.root, url.top.level,
+                              url.second.level ) )
+    }
+    
     if ( selection.second.level == "1" ){
       ##
       ## Grid data throughout Europe - daily
@@ -1421,8 +1458,11 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                "2" = "techn/",
                                "Second batch choice out of range" )
     ## Sanity check
-    dwd2r.url.check( paste0( url.root, url.top.level,
-                            url.second.level ) )
+    if ( is.null( batch.choices ) ){
+      dwd2r.url.check( paste0( url.root, url.top.level,
+                              url.second.level ) )
+    }
+    
     if ( selection.second.level == "1" ){
       ##
       ## Derived data from Germany - soil
@@ -1498,8 +1538,10 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
                                "Second batch choice out of range" )
     
     ## Sanity check
-    dwd2r.url.check( paste0( url.root, url.top.level,
-                            url.second.level ) )
+    if ( is.null( batch.choices ) ){
+      dwd2r.url.check( paste0( url.root, url.top.level,
+                              url.second.level ) )
+    }
 
     ## Fortunately they all feature the same folder structure.
     if ( !is.null( batch.choices ) ){
@@ -1542,8 +1584,13 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
 ##' @details The check will be performed \code{number.of.tries} per
 ##'   URL. The FTP server of the DWD is quite prone to identify the
 ##'   \code{\link[RCurl]{url.exists}} function as an DDOS attempt.
-##'   Therefore, one often was to redo the check after some
-##'   milliseconds (10ms) of waiting.
+##'   Therefore, the function will wait some random time before
+##'   attempting to check the URL. The waiting time will be normal
+##'   distributed with a mean of 150ms and a standard deviation of
+##'   50ms and the distribution is cut-off at 1ms to be the lowest
+##'   possible value (of course we do not want to have negative
+##'   waiting times and the Gaussian distribution has infinite
+##'   support).
 ##' 
 ##' @param url Either a simple string or a character vector of several
 ##'   URLs.
@@ -1561,7 +1608,7 @@ dwd2r.url.check <- function( url, number.of.tries = 5 ){
   for ( uu in 1 : length( url ) ){
     for ( nn in 1 : number.of.tries ){
       ## Avoid being detect as a bot
-      Sys.sleep( .08 )
+      Sys.sleep( max( rnorm( n = 1, mean = .15, sd = .05 ), .001 ) )
       if ( RCurl::url.exists( url[ uu ] ) ){
         break
       }
