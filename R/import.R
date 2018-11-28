@@ -255,7 +255,7 @@ conversion.climate <- function( files.list, files.description.list,
         latitude = station.positions[ 2 ],
         altitude = station.positions[ 3 ],
         name = station.names )
-  } else if ( class( station.positions ) == "data.frame" ){
+  } else if ( class( station.positions ) == "matrix" ){
     station.positions <- data.frame(
         longitude = station.positions[ , 1 ],
         latitude = station.positions[ , 2 ],
