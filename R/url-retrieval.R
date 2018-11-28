@@ -1,4 +1,4 @@
-### url-retrieval.R - All functions concerned with the
+\### url-retrieval.R - All functions concerned with the
 ### interaction with FTP server of the DWD
 
 ##' @title Obtain URLs to the FTP server
@@ -34,7 +34,7 @@
 ##' @examples
 ##' ## Get the URLs pointing to the aggregated collection of the daily
 ##' ## measured climatic data of the DWD.
-##' get.dwd.ftp.url( batch.choices  = c( 1, 1, 5, 1 ) )
+##' dwd2r:::get.dwd.ftp.url( batch.choices  = c( 1, 1, 5, 1 ) )
 ##'
 ##' @return List containing to two elements
 ##'   \itemize{
@@ -1608,7 +1608,7 @@ dwd2r.url.check <- function( url, number.of.tries = 5 ){
   for ( uu in 1 : length( url ) ){
     for ( nn in 1 : number.of.tries ){
       ## Avoid being detect as a bot
-      Sys.sleep( max( rnorm( n = 1, mean = .15, sd = .05 ), .001 ) )
+      Sys.sleep( max( stats::rnorm( n = 1, mean = .15, sd = .05 ), .001 ) )
       if ( RCurl::url.exists( url[ uu ] ) ){
         break
       }
