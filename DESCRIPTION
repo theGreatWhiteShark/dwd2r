@@ -2,8 +2,8 @@ Package: dwd2r
 Type: Package
 Title: Automated download and formatting of the data provided by the German weather service (DWD)
 Description: The German weather service (DWD) provides a large data base via a FTP server.  But since the data is stored in separate compressed archives per station, it is a quite tedious task to download a large set of them, like all daily temperature series throughout Germany, at once.  This package tries to give the user a more friendly interface.  It let you choose the data set of your choice using a command line interface, which guides you through the folder tree of the FTP server.  It will download all content in the selected nodes, and convert the extracted data in a format easily usable within R.
-Version: 0.1.0
-Date: 2018-11-28
+Version: 0.1.1
+Date: 2018-12-11
 LazyData: true
 Authors@R: person("Philipp Mueller", role = c("aut","cre"),
     email = "thetruephil@googlemail.com")

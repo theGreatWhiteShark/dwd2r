@@ -816,7 +816,7 @@ source.data <- function( download.folder = NULL, envir = NULL ){
   cat( '\n\n' )
   cat(
       'Please select one file by entering the corresponding number.\n' )
-  data.selection <- readline( 'Selection: ' )
+  data.selection <- readline( 'Selection:' )
 
   print( paste( "Loading file",
                data.path[ as.numeric( data.selection ) ], "..." ) )

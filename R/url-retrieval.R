@@ -70,7 +70,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
     cat( '\t\t4) Grid data throughout Europe\n' )
     cat( '\t\t5) Derived data from Germany\n' )
     cat( '\t\t6) Regional averages throughout Germany\n' )
-    selection.top.level <- readline( 'Selection: ' )
+    selection.top.level <- readline( 'Selection:' )
   }
 
   url.top.level <-
@@ -102,7 +102,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
       cat( '\t\t2) Urban climate\n' )
       cat( '\t\t3) Phenology\n' )
       cat( '\t\t4) Radiosondes\n' )
-      selection.second.level <- readline( 'Selection: ' )
+      selection.second.level <- readline( 'Selection:' )
     }
     
     url.second.level <-
@@ -134,7 +134,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t5) Daily\n' )
         cat( '\t\t6) Monthly\n' )
         cat( '\t\t7) Multi annual\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "1_minute/",
@@ -185,7 +185,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t4) Precipitation\n' )
           cat( '\t\t5) Solar\n' )
           cat( '\t\t6) Wind\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch( selection.fourth.level,
@@ -226,7 +226,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t8) Cloudiness\n' )
           cat( '\t\t9) Sun\n' )
           cat( '\t\t10) Visibility\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch( selection.fourth.level,
@@ -288,7 +288,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t3) Soil temperature\n' )
           cat( '\t\t4) Solar\n' )
           cat( '\t\t5) Water equivalence\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch( selection.fourth.level,
@@ -328,7 +328,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\n\n\tMeasurement variable:\n' )
           cat( '\t\t1) Classical aggregated data (multiple measurement variables)\n' )
           cat( '\t\t2) Additional precipitation data\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch( selection.fourth.level,
@@ -354,7 +354,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t1) Mean values from 1961 till 1990\n' )
           cat( '\t\t2) Mean values from 1971 till 2000\n' )
           cat( '\t\t3) Mean values from 1981 till 2010\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch( selection.fourth.level,
@@ -384,7 +384,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t4) Precipitation\n' )
         cat( '\t\t5) Wind\n' )
         cat( '\t\t6) Sun\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
 
       url.third.level <- switch( selection.third.level,
@@ -410,7 +410,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\n\n\tResponse type:\n' )
         cat( '\t\t1) Annual reporting\n' )
         cat( '\t\t2) Immediate reporting\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
 
       url.third.level <- switch( selection.third.level,
@@ -439,7 +439,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t3) Fruit\n' )
           cat( '\t\t4) Vine\n' )
           cat( '\t\t5) Wild\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch( selection.fourth.level,
@@ -483,7 +483,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t2) Fruit\n' )
           cat( '\t\t3) Vine\n' )
           cat( '\t\t4) Wild\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch( selection.fourth.level,
@@ -513,7 +513,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\n\n\tAvailable kinds of monthly air temperatures:\n' )
         cat( '\t\t1) Homogenized\n' )
         cat( '\t\t2) Raw\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
 
       url.third.level <- switch( selection.third.level,
@@ -543,7 +543,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
       cat( '\n\n\tMeasurement interval of the CLIMAT data:\n' )
       cat( '\t\t1) Monthly\n' )
       cat( '\t\t2) Multi annual\n' )
-      selection.second.level <- readline( "Selection: " )
+      selection.second.level <- readline( "Selection:" )
     }
 
     url.second.level <- switch( selection.second.level,
@@ -567,7 +567,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\n\n\tFormatting of the data:\n' )
         cat( '\t\t1) Qc\n' )
         cat( '\t\t2) Raw\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
 
       url.third.level <- switch( selection.third.level,
@@ -600,7 +600,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t8) Total precipitation\n' )
           cat( '\t\t9) Sunshine duration\n' )
           cat( '\t\t10) Vapour pressure\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch(
@@ -651,7 +651,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t4) Mean sea level pressure\n' )
         cat( '\t\t5) Total precipitation\n' )
         cat( '\t\t6) Sunshine duration\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
 
       url.third.level <- switch(
@@ -688,7 +688,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
       cat( '\t\t6) Annual\n' )
       cat( '\t\t7) Multi annual\n' )
       cat( '\t\t8) Return periods\n' )
-      selection.second.level <- readline( "Selection: " )
+      selection.second.level <- readline( "Selection:" )
     }
     url.second.level <- switch( selection.second.level,
                                "1" = "hourly/",
@@ -717,7 +717,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\n\n\tData source:\n' )
         cat( '\t\t1) Project TRY\n' )
         cat( '\t\t2) Radolan\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "Project_TRY/",
@@ -752,7 +752,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t10) Vapour pressure\n' )
           cat( '\t\t11) Wind direction\n' )
           cat( '\t\t12) Wind speed\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch(
@@ -818,7 +818,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t6) Precipitation (REGNIE grid)\n' )
         cat( '\t\t7) Soil moisture at 60cm depth under gras and sandy loam\n' )
         cat( '\t\t8) Soil temperature at 5cm depth\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "Project_TRY/",
@@ -859,7 +859,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t10) Vapour pressure\n' )
           cat( '\t\t11) Wind direction\n' )
           cat( '\t\t12) Wind speed\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch(
@@ -938,7 +938,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t14) Radiation (direct)\n' )
         cat( '\t\t15) Radiation (global)\n' )
         cat( '\t\t16) Sunshine duration\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "Project_TRY/",
@@ -987,7 +987,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
           cat( '\t\t10) Vapour pressure\n' )
           cat( '\t\t11) Wind direction\n' )
           cat( '\t\t12) Wind speed\n' )
-          selection.fourth.level <- readline( "Selection: " )
+          selection.fourth.level <- readline( "Selection:" )
         }
 
         url.fourth.level <- switch(
@@ -1065,7 +1065,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t4) Mean air temperature\n' )
         cat( '\t\t5) Precipitation\n' )
         cat( '\t\t6) Sunshine duration\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "drought_index/",
@@ -1096,7 +1096,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\n\n\tChoose measurement period:\n' )
         cat( '\t\t1) November till April\n' )
         cat( '\t\t2) May till October\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "18_NDJFMA/",
@@ -1137,7 +1137,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t19) Number of days with frost (min. air temperature < 0\u00B0C)\n' )
         cat( '\t\t20) Beginning of the vegetation\n' )
         cat( '\t\t21) End of the vegetation\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "phenology/",
@@ -1221,7 +1221,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t23) Actual evapotranspiration over gras and sandy loam\n' )
         cat( '\t\t24) Water balance\n' )
         cat( '\t\t25) Mean annual wind speeds from 10m to 100m and Weibull parameters\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "solar/",
@@ -1311,7 +1311,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\n\n\tChoose format:\n' )
         cat( '\t\t1) ASCII\n' )
         cat( '\t\t2) GIS\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "asc/",
@@ -1337,7 +1337,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
       cat( '\n\n\tMeasurement intervals:\n' )
       cat( '\t\t1) Daily\n' )
       cat( '\t\t2) Monthly\n' )
-      selection.second.level <- readline( "Selection: " )
+      selection.second.level <- readline( "Selection:" )
     }
     url.second.level <- switch( selection.second.level,
                                "1" = "daily/",
@@ -1365,7 +1365,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t2) Minimal air temperature\n' )
         cat( '\t\t3) Mean air temperature\n' )
         cat( '\t\t4) Daily mean near-surface (10m) wind speed\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "air_temperature_max/",
@@ -1403,7 +1403,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t3) Mean air temperature\n' )
         cat( '\t\t4) Daily mean near-surface (10m) wind speed\n' )
         cat( '\t\t5) Mean cloud cover\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "air_temperature_max/",
@@ -1451,7 +1451,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
       cat( '\n\n\tMeasurement variable:\n' )
       cat( '\t\t1) Different characteristic elements of soil and crops\n' )
       cat( '\t\t2) Number of degree days\n' )
-      selection.second.level <- readline( "Selection: " )
+      selection.second.level <- readline( "Selection:" )
     }
     url.second.level <- switch( selection.second.level,
                                "1" = "soil/",
@@ -1474,7 +1474,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
         cat( '\t\t1) Daily\n' )
         cat( '\t\t2) Monthly\n' )
         cat( '\t\t3) Multi annual\n' )
-        selection.third.level <- readline( "Selection: " )
+        selection.third.level <- readline( "Selection:" )
       }
       url.third.level <- switch( selection.third.level,
                                 "1" = "daily/",
@@ -1529,7 +1529,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
       cat( '\t\t1) Monthly\n' )
       cat( '\t\t2) Seasonal\n' )
       cat( '\t\t3) Annual\n' )
-      selection.second.level <- readline( "Selection: " )
+      selection.second.level <- readline( "Selection:" )
     }
     url.second.level <- switch( selection.second.level,
                                "1" = "monthly/",
@@ -1551,7 +1551,7 @@ get.dwd.ftp.url <- function( batch.choices = NULL ){
       cat( '\t\t1) Mean air temperature\n' )
       cat( '\t\t2) Precipitation\n' )
       cat( '\t\t3) Sunshine duration\n' )
-      selection.third.level <- readline( "Selection: " )
+      selection.third.level <- readline( "Selection:" )
     }
     url.third.level <- switch( selection.third.level,
                               "1" = "air_temperature_mean/",
