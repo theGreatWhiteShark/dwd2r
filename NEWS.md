@@ -1,3 +1,7 @@
+# v0.1.2.8000
+- Fixing bug in test scripts introduced by
+  `RCurl::url.exists()`. Regular words do suddenly return `TRUE`. WTF?
+  But entering a invalid URL does still result in `FALSE`.
 # v0.1.1
 - Fixing namespacing in the example of `get.dwd.ftp.url()`.
 - Explicitly use `stats` namespace for `rnorm` function in

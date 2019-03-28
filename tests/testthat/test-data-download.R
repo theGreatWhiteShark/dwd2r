@@ -5,7 +5,7 @@ context( "Checking the functions handling the access and download of the actual 
 
 test_that( "the 'list.files.in.url' function takes the right input and produces the right output.", {
   expect_error( dwd2r:::list.files.in.url( list() ) )
-  expect_error( dwd2r:::list.files.in.url( "ladida" ) )
+  expect_error( dwd2r:::list.files.in.url( "https://www.ladida.ladida" ) )
   expect_equal( class(
       dwd2r:::list.files.in.url( 'ftp://ftp-cdc.dwd.de/pub/CDC/' ) ),
       "character" )
@@ -15,7 +15,7 @@ test_that( "the 'list.files.in.url' function takes the right input and produces 
 
 test_that( "the 'download.content' function throws some errors.", {
   expect_error( dwd2r:::list.files.in.url( list() ) )
-  expect_error( dwd2r:::list.files.in.url( "ladida" ) ) } )
+  expect_error( dwd2r:::list.files.in.url( "https://ladida.ladida" ) ) } )
 
 ## Temporary folder to download some data into.
 tmp.dir.name <- "./download-test-funny-name-nobody-would-ever-choose"
