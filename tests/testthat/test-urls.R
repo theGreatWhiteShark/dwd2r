@@ -49,7 +49,7 @@ test_that( "the cat.dwd.ftp.url function has the same output format",{
   expect_equal( unique( Reduce( c, lapply( cat.dwd.ftp.url(),
                                           class ) ) ),
                "character" ) } )
-Sys.sleep( 2 )
+Sys.sleep( 4 )
 test_that( "the batch mode of get.dwd.ftp.url does work", {
   expect_equal( get.dwd.ftp.url( batch.choices =
                                    c( 1, 1, 5, 1 ) )$data,

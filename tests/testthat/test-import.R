@@ -145,7 +145,7 @@ test_that( "the xts .RData written by conversion.climate is of the right format"
       c( 13.0622, 52.3813 ) )
   expect_equal(
       get( "station.positions", envir = test.environment )@data,
-      data.frame( altitude = 81, name = "Potsdam" ) )
+      data.frame( id = 3987L, name = "Potsdam", altitude = 81 ) )
 })
 test.environment <- new.env( parent = .GlobalEnv )
 test_that( "the data.frame .RData written by conversion.climate is of the right format", {
@@ -173,8 +173,8 @@ test_that( "the data.frame .RData written by conversion.climate is of the right 
                  envir = test.environment ) ) == "data.frame" )
   expect_equal(
       get( "station.positions", envir = test.environment ),
-      data.frame( longitude = 13.0622, latitude = 52.3813,
-                 altitude = 81, name = "Potsdam" ) )
+      data.frame( id = 3987L, name = "Potsdam", longitude = 13.0622,
+                 latitude = 52.3813, altitude = 81 ) )
 })
 test_that( "the .csv written by conversion.climate is of the right format", {
   expect_equal( {
@@ -192,4 +192,3 @@ test_that( "the .csv written by conversion.climate is of the right format", {
   expect_true( all( data.xts == data.df ) )
 })
 unlink( dir.name, recursive = TRUE )
-      
