@@ -358,7 +358,7 @@ conversion.climate <- function( files.list, files.description.list,
   for ( qq.idx in 1 : length( stations.content[[ 1 ]]$data ) ){
     if ( !quiet && ( qq.idx %% 2 ) == 0 ){
       cat( paste0( "\r   Writing RData file ", qq.idx, " of ",
-                  length( stations.content[[ 1 ]] ), "..." ) )
+                  length( stations.content[[ 1 ]]$data ), "..." ) )
     }
     qq <- names( stations.content[[ 1 ]]$data )[ qq.idx ]
     save( list = paste0( "dwd.", qq ), station.positions,
