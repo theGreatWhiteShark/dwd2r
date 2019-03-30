@@ -1,4 +1,4 @@
-# v0.1.2.8000
+# v0.1.2
 - Fixing bug in test scripts introduced by
   `RCurl::url.exists()`. Regular words do suddenly return `TRUE`. WTF?
   But entering a invalid URL does still result in `FALSE`.
