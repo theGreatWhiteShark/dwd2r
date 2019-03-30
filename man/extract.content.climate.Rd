@@ -2,8 +2,8 @@
 % Please edit documentation in R/import.R
 \name{extract.content.climate}
 \alias{extract.content.climate}
-\title{Unzips and extracts the content of DWD source files
-  for a single station}
+\title{Unzips and extracts the content of DWD source files for a
+  single station}
 \usage{
 extract.content.climate(station.id, files.list, download.folder.recent,
   download.folder.historical, time.series.format = c("xts",
@@ -28,16 +28,10 @@ series. They can either be of type \strong{data.frame} and contain two
 columns, "date" and "value", or a time series provided by the
 \pkg{xts} package. Default = "xts".}
 }
-\value{
-- Named list of either \pkg{xts}-class or \strong{data.frame}
-  objects where each element of the list corresponds to one
-  column in the data files.
- - NULL if no data at all could be extracted for the station.
-}
 \description{
-Reads in the content of both the recent and
-  historical files corresponding to a single station, combines
-  its data, and converts it into a format R can handle.
+Reads in the content and the metadata of both the
+  recent and historical files corresponding to a single station,
+  combines its data, and converts it into a format R can handle.
 }
 \details{
 The station is specified by its \code{station.id}. The

@@ -1,3 +1,4 @@
+
 ##' @title Converts the downloaded files into a format usable within R
 ##' @description It takes a list of strings pointing to the individual
 ##'   files downloaded from the DWD server, extracts their content,
@@ -112,7 +113,7 @@ conversion.climate <- function( files.list, files.description.list,
       utils::read.table( files.description.list$recent,
                         header = FALSE, sep = "\t",
                         stringsAsFactors = FALSE,
-                        encoding = "UTF-8", skip = 2 )
+                        fileEncoding = "latin1", skip = 2 )
     ## Split it into a list to make efficient use of the grep command
     file.description.recent <-
       split( file.description.recent,
@@ -126,7 +127,7 @@ conversion.climate <- function( files.list, files.description.list,
       utils::read.table( files.description.list$historical,
                         header = FALSE, sep = "\t",
                         stringsAsFactors = FALSE,
-                        encoding = "UTF-8", skip = 2 )
+                        fileEncoding = "latin1", skip = 2 )
     ## Split it into a list to make efficient use of the grep command
     file.description.historical <- split(
         file.description.historical,
@@ -207,12 +208,14 @@ conversion.climate <- function( files.list, files.description.list,
             download.folder.historical = download.folder.historical,
             time.series.format = time.series.format )
     } )
-
+  
   ## Remove all stations for which no data could have been extracted.
   list.station.ids <- list.station.ids[
-      !Reduce( c, lapply( stations.content, is.null ) ) ]
+      !Reduce( c, lapply( stations.content, function( cc )
+        is.null( cc$data ) ) ) ]
   stations.content <- stations.content[
-      !Reduce( c, lapply( stations.content, is.null ) ) ]
+      !Reduce( c, lapply( stations.content, function( cc )
+        is.null( cc$data ) ) ) ]
 
   ## Clean up and delete the auxiliary folders used in extraction.
   unlink( download.folder.recent, recursive = TRUE )
@@ -227,47 +230,60 @@ conversion.climate <- function( files.list, files.description.list,
   ## following object will be a list of all quantities. It will get
   ## split into different entities at a latter point.
   quantities.content <-
-    lapply( 1 : length( stations.content[[ 1 ]] ), function( qq )
-      lapply( stations.content, function( ss ) ss[[ qq ]] ) )
+    lapply( 1 : length( stations.content[[ 1 ]]$data ), function( qq )
+      lapply( stations.content, function( ss ) ss$data[[ qq ]] ) )
   
   ## Create a distinct objects for each climatological quantity.
   for ( qq in 1 : length( quantities.content ) ){
-    assign( paste0( "dwd.", names( stations.content[[ 1 ]] )[ qq ] ),
+    assign( paste0( "dwd.", names( stations.content[[ 1 ]]$data )[ qq ] ),
            quantities.content[[ qq ]] )
   }
-  
-  ## assigning the stations names
-  if ( !quiet ){
-    cat( "\n\nExtract the name of the stations..." )
-  }
-  quantities.info <- lapply( list.station.ids, function( x )
-    extract.station.name.and.location( x, file.description ) )
-  station.names <- Reduce( c, lapply( quantities.info,
-                                     function( ss ) ss$name ) )
+
+  ## Reshape the metadata
   station.positions <-
-    Reduce( rbind, lapply( quantities.info, function( ss )
-      ss$location ) )
-  if ( class( station.positions ) == "numeric" ){
-    ## If there is just one station present, `rbind` does produce a
-    ## numerical vector and NOT a data.frame.
-    station.positions <- data.frame(
-        longitude = station.positions[ 1 ],
-        latitude = station.positions[ 2 ],
-        altitude = station.positions[ 3 ],
-        name = station.names )
-  } else if ( class( station.positions ) == "matrix" ){
-    station.positions <- data.frame(
-        longitude = station.positions[ , 1 ],
-        latitude = station.positions[ , 2 ],
-        altitude = station.positions[ , 3 ],
-        name = station.names )
-  } else {
-    stop( "Unknown class of the station.positions object" )
-  }
+    Reduce( rbind, lapply( stations.content, function( ss )
+      ss$metadata ) )
+  station.names <- station.positions$name
+
+  ## The code below uses the description file provided with the
+  ## data. But since the DWD decided to not keep it up to date
+  ## anymore, some stations are not mentioned in there and can not be
+  ## handled afterwards. Therefore it is obsolete and the metadata
+  ## above will be used instead.
+  ##
+  ## ## assigning the stations names
+  ## if ( !quiet ){
+  ##   cat( "\n\nExtract the name of the stations..." )
+  ## }
+  ## quantities.info <- lapply( list.station.ids, function( x )
+  ##   extract.station.name.and.location( x, file.description ) )
+  ## station.names <- Reduce( c, lapply( quantities.info,
+  ##                                    function( ss ) ss$name ) )
+  ## station.positions <-
+  ##   Reduce( rbind, lapply( quantities.info, function( ss )
+  ##     ss$location ) )
+  ## if ( class( station.positions ) == "numeric" ){
+  ##   ## If there is just one station present, `rbind` does produce a
+  ##   ## numerical vector and NOT a data.frame.
+  ##   station.positions <- data.frame(
+  ##       longitude = station.positions[ 1 ],
+  ##       latitude = station.positions[ 2 ],
+  ##       altitude = station.positions[ 3 ],
+  ##       name = station.names )
+  ## } else if ( class( station.positions ) == "matrix" ){
+  ##   station.positions <- data.frame(
+  ##       longitude = station.positions[ , 1 ],
+  ##       latitude = station.positions[ , 2 ],
+  ##       altitude = station.positions[ , 3 ],
+  ##       name = station.names )
+  ## } else {
+  ##   stop( "Unknown class of the station.positions object" )
+  ## }
   
   ## Ordering the stations according to their names in alphabetical
   ## order.
-  station.positions <- station.positions[ order( station.names ), ]
+  station.positions <- station.positions[
+      order( station.positions$name, station.positions$id ), ]
 
   ## Convert the data.frame containing the spatial information into
   ## geospatial object native to R
@@ -277,7 +293,7 @@ conversion.climate <- function( files.list, files.description.list,
   
   ## Assigning the names of the stations to the lists of the
   ## climatological quantities.
-  for ( ss in paste0( "dwd.", names( stations.content[[ 1 ]] ) ) ){
+  for ( ss in paste0( "dwd.", names( stations.content[[ 1 ]]$data ) ) ){
     ## Get the object of the name ss, names its elements according to
     ## the corresponding stations, and order its content
     ## alphabetically.
@@ -293,12 +309,12 @@ conversion.climate <- function( files.list, files.description.list,
       cat( "\n\nWrite csv files to disk...\n" )
     }
     ## Create a distinct folder for each quantity.
-    for ( qq.idx in 1 : length( stations.content[[ 1 ]] ) ){
+    for ( qq.idx in 1 : length( stations.content[[ 1 ]]$data ) ){
       if ( !quiet && ( qq.idx %% 2 ) == 0 ){
         cat( paste0( "\r   Writing csv file ", qq.idx, " of ",
-                   length( stations.content[[ 1 ]] ), "..." ) )
+                   length( stations.content[[ 1 ]]$data ), "..." ) )
       }
-      qq <- names( stations.content[[ 1 ]] )[ qq.idx ]
+      qq <- names( stations.content[[ 1 ]]$data )[ qq.idx ]
       if ( !dir.exists( paste0( download.folder, "csv/",
                                prefix.file.name, '/', qq ) ) ){
         dir.create( paste0( download.folder, "csv/",
@@ -339,12 +355,12 @@ conversion.climate <- function( files.list, files.description.list,
   if ( !quiet ){
     cat( "\n\nWriting converted data to disk...\n" )
   }
-  for ( qq.idx in 1 : length( stations.content[[ 1 ]] ) ){
+  for ( qq.idx in 1 : length( stations.content[[ 1 ]]$data ) ){
     if ( !quiet && ( qq.idx %% 2 ) == 0 ){
       cat( paste0( "\r   Writing RData file ", qq.idx, " of ",
                   length( stations.content[[ 1 ]] ), "..." ) )
     }
-    qq <- names( stations.content[[ 1 ]] )[ qq.idx ]
+    qq <- names( stations.content[[ 1 ]]$data )[ qq.idx ]
     save( list = paste0( "dwd.", qq ), station.positions,
          file = paste0( download.folder, "dwd_",
                        prefix.file.name, '_',
@@ -356,11 +372,11 @@ conversion.climate <- function( files.list, files.description.list,
   invisible( TRUE )
 }
 
-##' @title Unzips and extracts the content of DWD source files
-##'   for a single station
-##' @description Reads in the content of both the recent and
-##'   historical files corresponding to a single station, combines
-##'   its data, and converts it into a format R can handle.
+##' @title Unzips and extracts the content of DWD source files for a
+##'   single station
+##' @description Reads in the content and the metadata of both the
+##'   recent and historical files corresponding to a single station,
+##'   combines its data, and converts it into a format R can handle.
 ##' @details The station is specified by its \code{station.id}. The
 ##'   extraction will take place in either
 ##'   \code{download.folder.recent} or
@@ -396,11 +412,17 @@ conversion.climate <- function( files.list, files.description.list,
 ##'             "produkt_potsdam_recent_03987_mock.zip" ) ),
 ##'           "tmpRecent", "tmpHistorical", "xts" )
 ##' 
-##' @return
-##'  - Named list of either \pkg{xts}-class or \strong{data.frame}
-##'   objects where each element of the list corresponds to one
-##'   column in the data files.
-##'  - NULL if no data at all could be extracted for the station.
+##' @return In case the extraction did work, it returns the following
+##'   list  
+##'   \itemize{
+##'     \item{\emph{data} - A named list of either \pkg{xts}-class or
+##'        \strong{data.frame} objects where each element of the list
+##'        corresponds to one column in the data files.}
+##'     \item{\emph{metadata} - A \strong{data.frame} containing
+##'        information about the station in the columns, like id,
+##'        name, longitude, latitude, and altitude.
+##'
+##'  If not, NULL is returned.
 ##' @author Philipp Mueller
 extract.content.climate <- function( station.id, files.list,
                                     download.folder.recent,
@@ -532,6 +554,34 @@ extract.content.climate <- function( station.id, files.list,
     warning( paste( "extracted content does not match for station",
                    station.id ) )
   }
+
+  ## Extract the metadata of a station.
+  ## Here I will assume that the metadata are both present in the
+  ## historical and recent folder and both feature exactly the same
+  ## content.
+  if ( length( index.recent ) > 0 ){
+    metadata.file <- grep(
+        "Metadaten_Geographie",
+        paste0( download.folder.recent,
+               list.files( download.folder.recent ) ),
+        value = TRUE )
+  } else {
+    metadata.file <- grep(
+        "Metadaten_Geographie",
+        paste0( download.folder.historical,
+               list.files( download.folder.historical ) ),
+        value = TRUE )
+  }
+  result.metadata <- import.file.metadata.climate( metadata.file )
+  ## Sanity check. The ID provided to this function and the one found
+  ## in the metadata have to match.
+  if ( as.numeric( station.id ) != result.metadata$id ){
+    warning( paste(
+        "The ID in the metadata does not match the ID of the overall station for ID:",
+        station.id, "Station will be omitted." ) )
+    return( NULL )
+  }
+  
   ## Merge all time series concerning one climatological variable into
   ## one and provide them as a list of class xts or data.frame elements.
   ## Start with the first list of results and add all data of the
@@ -581,7 +631,8 @@ extract.content.climate <- function( station.id, files.list,
   }
   ## The name got lost during the merging of the content.
   names( result.list ) <- names( content.list[[ 1 ]] )
-  return( result.list )
+  return( list( data = result.list,
+               metadata = result.metadata ) )
 }
 
 ##' @title Extract the names and the position of the individual
@@ -678,17 +729,19 @@ import.file.content.climate <- function( file.path,
   ## the file to read just consists of one line, to fail. Therefore,
   ## it has to be avoided by checking how many characters are present
   ## in the last line.
-  file.content <- readLines( file.path )
+  file.content <- readLines( file.path, encoding = "latin1" )
   if ( nchar( file.content[ length( file.content ) ] ) < 10 ){
     ## only the last line with the potential delimiter will be
     ## omitted. Minus two, because we have to omit the header as well.
     file.data <-
       utils::read.table(
                  file.path, header = TRUE, sep = ";",
-                 nrows = ( length( file.content ) - 2 ) )
+                 nrows = ( length( file.content ) - 2 ),
+                 fileEncoding = "latin1" )
   } else {
-    file.data <- utils::read.table( file.path, header = TRUE,
-                                   sep = ";" )
+    file.data <- utils::read.table(
+                            file.path, header = TRUE,
+                            sep = ";", fileEncoding = "latin1" )
   }
   ## Converting the data into a list of xts-class objects. Each data
   ## column will constitute an element in the list. Since the last
@@ -745,6 +798,53 @@ import.file.content.climate <- function( file.path,
   }
   
   return( results.list )
+}
+
+##' @title Imports the metadata of a single data .zip folder into R
+##' @description If the actual measurement station was relocated, the
+##'   DWD sticks to the same name and ID but adds another line in the
+##'   Metadaten_Gepgraphie_ file. In this function I will only access
+##'   the most recent position (contained in the last line).
+##'
+##' @param file.path Path to a single Metadaten_Geographie_* file
+##'   contained in the zip archives of the DWD.
+##' 
+##' @return A data.frame containing
+##'   \itemize{
+##'     \item{\emph{id} - The ID of the station}
+##'     \item{\emph{name} - Its name}
+##'     \item{\emph{longitude} - Its longitude in degree}
+##'     \item{\emph{latitude} - Its latitude in degree}
+##'     \item{\emph{altitude} - Its altitude in meters}
+##'   }
+##' @author Philipp Mueller
+import.file.metadata.climate <- function( file.path ){
+  ## Sometimes there is a single delimiter symbol in the last line.
+  ## This causes the read.table function to throw a warning and, if
+  ## the file to read just consists of one line, to fail. Therefore,
+  ## it has to be avoided by checking how many characters are present
+  ## in the last line.
+  file.content <- readLines( file.path, encoding = "latin1" )
+  if ( nchar( file.content[ length( file.content ) ] ) < 10 ){
+    ## only the last line with the potential delimiter will be
+    ## omitted. Minus two, because we have to omit the header as well.
+    file.data <-
+      utils::read.table(
+                 file.path, header = TRUE, sep = ";",
+                 nrows = ( length( file.content ) - 2 ),
+                 fileEncoding = "latin1" )
+  } else {
+    file.data <- utils::read.table( file.path, header = TRUE,
+                                   sep = ";",
+                                   fileEncoding = "latin1" )
+  }
+  
+  return( data.frame(
+      id = file.data[ nrow( file.data ), 1 ],
+      name = file.data[ nrow( file.data ), 7 ],
+      longitude = file.data[ nrow( file.data ), 4 ],
+      latitude = file.data[ nrow( file.data ), 3 ],
+      altitude = file.data[ nrow( file.data ), 2 ] ) )
 }
 
 ##' @title Load a data file into R
